@@ -1,0 +1,23 @@
+{
+    "name": "server",
+    "version": "1.0.0",
+    "main": "src/index.ts",
+    "scripts": {
+        "dev": "tsx watch src/server.ts"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "@hono/node-server": "^1.13.7",
+        "@prisma/client": "^6.5.0",
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.7",
+        "hono": "^4.6.18",
+        "tsx": "^4.19.2"
+    },
+    "devDependencies": {
+        "@types/dotenv": "^6.1.1"
+    }
+}
