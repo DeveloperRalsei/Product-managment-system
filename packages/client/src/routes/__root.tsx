@@ -1,22 +1,52 @@
 import { AppShell } from "@mantine/core";
-import { createRootRoute, Outlet, redirect } from "@tanstack/react-router";
-import { Header, Navbar } from "../components";
+import {
+    createRootRoute,
+    Outlet,
+    redirect,
+    useLocation,
+} from "@tanstack/react-router";
+import {
+    ErrorComponent,
+    Header,
+    Navbar,
+    NotFoundComponent,
+} from "../components";
 import { useDisclosure } from "@mantine/hooks";
+import { getUser } from "@/utils/user";
+
+function redirectLogin() {
+    throw redirect({
+        to: "/login",
+        search: {
+            redirect: location.pathname,
+        },
+        reloadDocument: true,
+    });
+}
 
 export const Route = createRootRoute({
     component: RootComponent,
-    beforeLoad: ({}) => {
-        throw redirect({
-            to: "/login",
-            search: {
-                redirect: window.location.href,
-            },
-        });
+    errorComponent: ErrorComponent,
+    notFoundComponent: NotFoundComponent,
+    async beforeLoad({ location }) {
+        try {
+            const user = await getUser();
+            if (!user) {
+                redirectLogin();
+            }
+        } catch (err) {
+            redirectLogin();
+        }
     },
 });
 
 function RootComponent() {
     const [navbarOpened, { toggle }] = useDisclosure();
+    const { pathname } = useLocation();
+
+    if (pathname === "/login") {
+        return <Outlet />;
+    }
 
     return (
         <AppShell

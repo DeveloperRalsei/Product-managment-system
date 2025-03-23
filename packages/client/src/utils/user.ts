@@ -6,10 +6,10 @@ export function isAuthenticated() {
     return !!auth.user;
 }
 
-export const getUser = async (): Promise<User> => {
-    const res = await fetch("/api/auth");
-    if (!res.ok) {
-        throw new Error("Failed to fetch user");
-    }
-    return await res.json();
+export const getUser = async (): Promise<string | User | undefined> => {
+    return await fetch("/api/auth").then((res) => {
+        if (res.ok) {
+            return res.text();
+        }
+    });
 };
