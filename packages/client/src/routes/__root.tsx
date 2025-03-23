@@ -12,7 +12,7 @@ import {
     NotFoundComponent,
 } from "../components";
 import { useDisclosure } from "@mantine/hooks";
-import { getUser } from "@/utils/user";
+import { isAuthenticated } from "@/utils/user";
 
 function redirectLogin() {
     throw redirect({
@@ -30,8 +30,7 @@ export const Route = createRootRoute({
     notFoundComponent: NotFoundComponent,
     async beforeLoad({ location }) {
         try {
-            const user = await getUser();
-            if (!user) {
+            if (!isAuthenticated() && location.pathname !== "/login") {
                 redirectLogin();
             }
         } catch (err) {
