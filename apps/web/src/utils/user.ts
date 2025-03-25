@@ -1,21 +1,11 @@
 import { User } from "#";
 
 export async function isAuthenticated() {
-    const token = localStorage.getItem("session-token");
-    if (!token || (token && token === "") || (token && token === "undefined")) {
-        return false;
-    }
-
     const res = await fetch("/api/auth", {
         credentials: "include",
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
     });
 
-    if (!res.ok) return false;
-
-    return true;
+    return res.ok;
 }
 
 export const getUser = async (): Promise<User | undefined> => {

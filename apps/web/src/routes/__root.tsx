@@ -1,4 +1,4 @@
-import { AppShell } from "@mantine/core";
+import { AppShell, Space } from "@mantine/core";
 import {
     createRootRoute,
     Outlet,
@@ -13,12 +13,13 @@ import {
 } from "../components";
 import { useDisclosure } from "@mantine/hooks";
 import { isAuthenticated } from "@/utils/user";
+import { BreadCrumbs } from "@/components/AppShell/Breadcrumbs";
 
-function redirectLogin() {
+function redirectLogin(redirectPath: string = "/") {
     throw redirect({
         to: "/login",
         search: {
-            redirect: location.pathname,
+            redirect: redirectPath,
         },
         reloadDocument: true,
     });
@@ -32,10 +33,10 @@ export const Route = createRootRoute({
         try {
             const auth = await isAuthenticated();
             if (!auth && location.pathname !== "/login") {
-                redirectLogin();
+                redirectLogin(location.pathname);
             }
         } catch (err) {
-            redirectLogin();
+            redirectLogin(location.pathname);
         }
     },
 });
@@ -70,7 +71,9 @@ function RootComponent() {
             />
             <Navbar />
             <AppShell.Main>
+                <BreadCrumbs />
                 <Outlet />
+                <Space h="200vh" />
             </AppShell.Main>
         </AppShell>
     );

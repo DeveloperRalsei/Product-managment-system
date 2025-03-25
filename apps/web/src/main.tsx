@@ -6,12 +6,13 @@ import { createRouter, RouterProvider } from "@tanstack/react-router";
 
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
-import "./styles.css";
+import "./styles/styles.css";
 
 import { routeTree } from "./routeTree.gen";
 import { theme } from "./config/theme";
 import { UserProvider } from "./components/user";
 import { Notifications } from "@mantine/notifications";
+import { BreadcrumbsProvider } from "./components/AppShell/Breadcrumbs";
 const router = createRouter({ routeTree });
 
 declare module "@tanstack/react-router" {
@@ -27,8 +28,10 @@ createRoot(document.getElementById("app")!).render(
         <MantineProvider theme={theme} defaultColorScheme="dark">
             <QueryClientProvider client={queryClient}>
                 <UserProvider>
-                    <RouterProvider router={router} />
-                    <Notifications position="bottom-right" />
+                    <BreadcrumbsProvider>
+                        <RouterProvider router={router} />
+                        <Notifications position="bottom-right" />
+                    </BreadcrumbsProvider>
                 </UserProvider>
             </QueryClientProvider>
         </MantineProvider>

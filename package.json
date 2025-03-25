@@ -2,13 +2,13 @@
     "name": "nextjs-item-managment-system",
     "private": true,
     "scripts": {
-        "client:dev": "cd packages/client && npm run dev",
-        "client:build": "cd packages/client && npm run build",
-        "server:dev": "cd packages/server && npm run dev",
+        "client:dev": "cd apps/web && npm run dev",
+        "client:build": "cd apps/web && npm run build",
+        "server:dev": "cd apps/api && npm run dev",
         "dev": "concurrently \"npm run client:dev*\" \"npm run server:dev\""
     },
     "workspaces": [
-        "packages/*"
+        "apps/*"
     ],
     "dependencies": {
         "@mantine/form": "^7.17.2",

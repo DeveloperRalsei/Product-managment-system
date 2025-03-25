@@ -1,12 +1,12 @@
 import { MiddlewareHandler } from "hono";
-import { sign, verify } from "hono/jwt";
-import { deleteCookie, getCookie, setCookie } from "hono/cookie";
+import { decode, sign } from "hono/jwt";
+import { getCookie, setCookie } from "hono/cookie";
 import { User, userAuthentication } from "#";
-import { JWT_SECRET } from "~/constants";
+import { IS_PRODUCTION } from "~/constants";
 import { ZodError } from "zod";
 
 export const authUser: MiddlewareHandler = async (c) => {
-    const sessionToken = c.req.header("Authorization")?.split(" ")[1];
+    const sessionToken = getCookie(c, "session-token");
 
     if (!sessionToken) {
         c.status(401);
@@ -15,7 +15,7 @@ export const authUser: MiddlewareHandler = async (c) => {
         });
     }
 
-    const user = await verify(sessionToken, JWT_SECRET!);
+    const { payload: user } = decode(sessionToken);
     return c.json(user);
 };
 
@@ -44,22 +44,36 @@ export const loginUser: MiddlewareHandler = async (c) => {
     };
 
     try {
-        userAuthentication.parse(tempUser);
+        userAuthentication.parse({
+            email: tempUser.email,
+            password: tempUser.password,
+        });
     } catch (error) {
         c.status(400);
         const zodError = error as ZodError;
-        return c.json(zodError.errors);
+        return c.json({
+            message: zodError.message,
+            errors: zodError.errors,
+        });
     }
 
     // TODO: create a user in the database
     if (email === "1234@1234.com" && password === "123456") {
-        const token = await sign(tempUser, JWT_SECRET!);
+        const token = await sign(tempUser, process.env.JWT_SECRET!);
 
         c.status(200);
 
+        setCookie(c, "session-token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "Strict",
+            maxAge: 60 * 60 * 24,
+            path: "/",
+            domain: IS_PRODUCTION ? "devrals.xyz" : "localhost",
+        });
+
         return c.json({
-            message: "User logged in",
-            token,
+            message: "Logged in",
         });
     }
 

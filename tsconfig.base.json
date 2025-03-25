@@ -11,9 +11,9 @@
         "alwaysStrict": true,
         "baseUrl": ".",
         "paths": {
-            "#": ["./packages/common/src/index.ts"],
-            "@/*": ["./packages/client/src/*"],
-            "~/*": ["./packages/server/src/*"]
+            "#": ["./apps/common/src/index.ts"],
+            "@/*": ["./apps/web/src/*"],
+            "~/*": ["./apps/api/src/*"]
         },
         "moduleResolution": "Node",
         "resolveJsonModule": true,

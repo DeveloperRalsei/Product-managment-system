@@ -6,11 +6,11 @@ export const links: (navLink & { icon?: React.ReactNode })[] = [
     {
         label: "Home",
         path: "/",
-        icon: <IconHome size={20} />
+        icon: <IconHome size={20} />,
     },
     {
         label: "Meow :3",
-        path: "/mrr",
-        icon: <IconCat size={20} />
-    }
-]
+        path: "/test",
+        icon: <IconCat size={20} />,
+    },
+];

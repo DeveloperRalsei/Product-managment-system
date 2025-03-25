@@ -5,6 +5,7 @@ import {
     Divider,
     Flex,
     Paper,
+    PasswordInput,
     Stack,
     TextInput,
     Title,
@@ -16,17 +17,16 @@ import {
     redirect as redirectToUrl,
 } from "@tanstack/react-router";
 import { useState } from "react";
-import { ZodError } from "zod";
 
 export const Route = createFileRoute("/login")({
     component: RouteComponent,
     validateSearch: ({ redirect }) => ({
-        redirect: (redirect as string) || "/",
+        redirect: (redirect as string) ?? "/",
     }),
     beforeLoad: async ({ search: { redirect } }) => {
         const auth = await isAuthenticated();
         if (auth) {
-            throw redirectToUrl({ to: redirect, reloadDocument: true });
+            throw redirectToUrl({ to: redirect || "/", reloadDocument: true });
         }
     },
 });
@@ -43,24 +43,20 @@ function RouteComponent() {
     });
 
     const handleSubmit = async (v: { email: string; password: string }) => {
-        try {
-            userAuthentication.parse(v);
-        } catch (error) {
-            const zodError = error as ZodError;
+        const { success, error } = userAuthentication.safeParse(v);
 
-            for (const err of zodError.errors) {
-                if (err.path[0] === "email") {
-                    form.setFieldError("email", err.message);
-                } else if (err.path[0] === "password") {
-                    form.setFieldError("password", err.message);
-                }
-            }
+        if (!success) {
+            const errors = error.flatten().fieldErrors;
+            if (errors.email) form.setFieldError("email", errors.email[0]);
+            if (errors.password)
+                form.setFieldError("password", errors.password[0]);
             return;
         }
 
         try {
             setIsLoading(true);
             const response = await fetch("/api/auth/login", {
+                credentials: "include",
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -76,16 +72,13 @@ function RouteComponent() {
                 return;
             }
 
-            const { token } = await response.json();
-            localStorage.setItem("session-token", token);
-
             showNotification({
                 color: "green",
                 message: "Logged in successfuly",
             });
 
             await wait(1000);
-            throw redirectToUrl({ to: search?.redirect });
+            throw redirectToUrl({ to: search?.redirect || "/" });
         } catch (error) {
             showNotification({
                 message: "Something went wrong",
@@ -113,9 +106,8 @@ function RouteComponent() {
                             {...form.getInputProps("email")}
                         />
 
-                        <TextInput
-                            label="password"
-                            type="password"
+                        <PasswordInput
+                            label="Password"
                             placeholder="******"
                             {...form.getInputProps("password")}
                         />
