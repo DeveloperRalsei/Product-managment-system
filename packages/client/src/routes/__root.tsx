@@ -30,7 +30,8 @@ export const Route = createRootRoute({
     notFoundComponent: NotFoundComponent,
     async beforeLoad({ location }) {
         try {
-            if (!isAuthenticated() && location.pathname !== "/login") {
+            const auth = await isAuthenticated();
+            if (!auth && location.pathname !== "/login") {
                 redirectLogin();
             }
         } catch (err) {

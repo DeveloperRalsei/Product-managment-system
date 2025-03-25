@@ -11,7 +11,6 @@ const API_URL = process.env.API_URL;
 export default defineConfig(({ mode }) => ({
     plugins: [react(), tsconfigPaths(), TanStackRouterVite()],
     server: {
-        cors: true,
         hmr: true,
         proxy: {
             "/api": {
