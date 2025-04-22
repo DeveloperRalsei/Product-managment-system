@@ -1,0 +1,18 @@
+{
+    "name": "nextjs-item-managment-system",
+    "private": true,
+    "scripts": {
+        "client:dev": "cd apps/web && pnpm dev",
+        "client:build": "cd apps/web && pnpm build",
+        "server:dev": "cd apps/api && pnpm dev",
+        "dev": "concurrently \"pnpm run client:dev\" \"pnpm run server:dev\""
+    },
+    "workspaces": [
+        "apps/*"
+    ],
+    "dependencies": {
+        "concurrently": "^9.0.1",
+        "typescript": "^5.6.3",
+        "zod": "^3.24.3"
+    }
+}
