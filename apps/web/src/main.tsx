@@ -6,6 +6,7 @@ import { createRouter, RouterProvider } from "@tanstack/react-router";
 
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
+import "@mantine/code-highlight/styles.css";
 import "./styles.css";
 
 import { routeTree } from "./routeTree.gen";
@@ -27,8 +28,8 @@ createRoot(document.getElementById("app")!).render(
         <MantineProvider theme={theme} defaultColorScheme="dark">
             <ModalsProvider
                 labels={{
-                    cancel: "Hayır",
-                    confirm: "Evet",
+                    cancel: "İptal Et",
+                    confirm: "Onayla",
                 }}
                 modalProps={{
                     centered: true,

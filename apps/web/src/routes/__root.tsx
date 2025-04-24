@@ -1,12 +1,10 @@
-import { AppShell } from "@mantine/core";
 import {
     createRootRoute,
     Outlet,
     redirect,
     useLocation,
 } from "@tanstack/react-router";
-import { Header, Navbar, NotFoundComponent } from "../components";
-import { useDisclosure } from "@mantine/hooks";
+import { Layout, NotFoundComponent } from "../components";
 import { isAuthenticated } from "@/utils/auth";
 import { ErrorComponent } from "@/components/ui/page/ErrorComponent";
 
@@ -37,35 +35,13 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
-    const [navbarOpened, { toggle }] = useDisclosure();
     const { pathname } = useLocation();
 
     if (pathname === "/login") return <Outlet />;
 
     return (
-        <AppShell
-            header={{
-                height: 60,
-            }}
-            navbar={{
-                breakpoint: "sm",
-                width: 240,
-                collapsed: {
-                    desktop: false,
-                    mobile: !navbarOpened,
-                },
-            }}
-        >
-            <Header
-                navbar={{
-                    opened: navbarOpened,
-                    toggle,
-                }}
-            />
-            <Navbar />
-            <AppShell.Main>
-                <Outlet />
-            </AppShell.Main>
-        </AppShell>
+        <Layout>
+            <Outlet />
+        </Layout>
     );
 }

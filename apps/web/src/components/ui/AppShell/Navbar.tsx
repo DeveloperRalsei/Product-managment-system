@@ -9,12 +9,15 @@ import {
     Text,
 } from "@mantine/core";
 import { links } from "apps/web/src/data/routing";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { logout, useUser } from "@/utils/auth";
 import { IconLogout } from "@tabler/icons-react";
 import { openConfirmModal } from "@mantine/modals";
+import { useState } from "react";
 
-export const Navbar = () => {
+export const Navbar = ({ close }: { close: () => void }) => {
+    const [active, setActive] = useState(0);
+    const [childActive, setChildActive] = useState<null | number>(null);
     const { user, loading } = useUser();
     const navigate = useNavigate();
 
@@ -38,19 +41,54 @@ export const Navbar = () => {
         });
     };
 
+    const handleClose = (path: string, activeIndex: number) => {
+        setActive(activeIndex);
+        setChildActive(null);
+        close();
+        navigate({
+            to: path,
+        });
+    };
+
     return (
         <AppShellNavbar>
-            {/* <AppShellSection>Nav Head</AppShellSection> */}
             <AppShellSection component={Stack} gap={0} grow>
-                {links.map((l, i) => (
-                    <NavLink
-                        key={"navlink" + l.label + i}
-                        rightSection={l.icon}
-                        component={Link}
-                        to={l.path}
-                        label={l.label}
-                    />
-                ))}
+                {links.map((link, i) => {
+                    if ("childs" in link) {
+                        return (
+                            <NavLink
+                                key={link.label + i}
+                                label={link.label}
+                                leftSection={
+                                    link.icon ? <link.icon /> : undefined
+                                }
+                                active={i === active}
+                            >
+                                {link.childs.map((childLink, j) => (
+                                    <NavLink
+                                        key={childLink.label + i + j}
+                                        label={childLink.label}
+                                        onClick={() => {
+                                            handleClose(childLink.path, i);
+                                            setChildActive(j);
+                                        }}
+                                        active={j === childActive}
+                                    />
+                                ))}
+                            </NavLink>
+                        );
+                    }
+
+                    return (
+                        <NavLink
+                            key={link.label + i}
+                            label={link.label}
+                            leftSection={link.icon ? <link.icon /> : undefined}
+                            active={i === active}
+                            onClick={() => handleClose(link.path, i)}
+                        />
+                    );
+                })}
             </AppShellSection>
             <AppShellSection
                 p="sm"

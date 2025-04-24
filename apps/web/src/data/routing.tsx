@@ -1,16 +1,26 @@
-import { IconCat } from "@tabler/icons-react";
+import { IconUsers, TablerIconsProps } from "@tabler/icons-react";
 import { navLink } from "../types";
 import { IconHome } from "@tabler/icons-react";
 
-export const links: (navLink & { icon?: React.ReactNode })[] = [
+export const links: (navLink & { icon?: React.FC<TablerIconsProps> })[] = [
     {
-        label: "Home",
+        label: "Kılavuz",
         path: "/",
-        icon: <IconHome size={20} />
+        icon: IconHome,
     },
+
     {
-        label: "Meow :3",
-        path: "/mrr",
-        icon: <IconCat size={20} />
-    }
-]
+        label: "Kullanıcılar",
+        icon: IconUsers,
+        childs: [
+            {
+                label: "Listele",
+                path: "/users",
+            },
+            {
+                label: "Ekle",
+                path: "/users/new",
+            },
+        ],
+    },
+];

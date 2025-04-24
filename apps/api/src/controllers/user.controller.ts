@@ -1,7 +1,8 @@
-import { MakeOptional, User } from "#";
 import { Prisma } from "@prisma/client";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { MiddlewareHandler } from "hono";
 import prisma from "~/service/prisma";
+import { encryptPassword } from "~/utils";
 
 export const getAllUsers: MiddlewareHandler = async (c) => {
     const { q } = c.req.query();
@@ -39,7 +40,7 @@ export const createUser: MiddlewareHandler = async (c) => {
         name,
         email,
         password,
-    }: MakeOptional<Omit<User, "id" | "verified">, "name"> = body;
+    }: { name?: string; email: string; password: string } = body;
 
     if (!email || !password) {
         return c.json(
@@ -52,16 +53,33 @@ export const createUser: MiddlewareHandler = async (c) => {
     }
 
     try {
-        const users = await prisma.user.findMany({ where: { email } });
-        const isExist = users.length > 0;
+        const userFound = await prisma.user.findFirst({ where: { email } });
 
-        if (isExist) {
-            return c.json(
-                {
-                    message: "Email already in use",
-                },
-                409,
-            );
-        }
-    } catch (error) {}
+        if (userFound) return c.json({ message: "Email already in use" }, 409);
+
+        const newUser = await prisma.user.create({
+            data: {
+                name,
+                email,
+                password: encryptPassword(password),
+            },
+        });
+
+        return c.json(
+            {
+                message: "User created",
+                user: newUser,
+            },
+            201,
+        );
+    } catch (error) {
+        const message =
+            error instanceof PrismaClientKnownRequestError
+                ? error.message
+                : JSON.stringify(error);
+        return c.json({
+            message,
+            error,
+        });
+    }
 };
