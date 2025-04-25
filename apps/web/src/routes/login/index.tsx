@@ -19,7 +19,7 @@ import {
 } from "@tanstack/react-router";
 import { useState } from "react";
 
-export const Route = createFileRoute("/login")({
+export const Route = createFileRoute("/login/")({
     component: RouteComponent,
     validateSearch: ({ redirect }) => ({
         redirect: (redirect as string) ?? "/",
@@ -34,7 +34,7 @@ export const Route = createFileRoute("/login")({
 
 function RouteComponent() {
     const { redirect } = useSearch({
-        from: "/login",
+        from: "/login/",
     });
 
     const navigate = useNavigate();
@@ -58,6 +58,16 @@ function RouteComponent() {
                 showNotification({
                     color: "red",
                     message: "Kullanıcı adı veya şifre yanlış",
+                });
+                return;
+            }
+
+            if (status === 403) {
+                sessionStorage.setItem("pending_email", form.getValues().email);
+                navigate({
+                    to: "/login/verify",
+                    reloadDocument: true,
+                    search: { redirect },
                 });
                 return;
             }

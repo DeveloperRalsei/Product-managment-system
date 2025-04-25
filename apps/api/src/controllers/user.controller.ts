@@ -18,9 +18,9 @@ export const getAllUsers: MiddlewareHandler = async (c) => {
                   }
                 : {},
             select: {
-                id: true,
-                email: true,
                 name: true,
+                email: true,
+                verified: true,
             },
         });
 

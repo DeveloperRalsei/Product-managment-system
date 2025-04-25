@@ -1,4 +1,5 @@
 import { MakeOptional, User } from "#";
+import { createUser } from "@/utils/user";
 import {
     Alert,
     Anchor,
@@ -14,6 +15,7 @@ import {
 import { useForm, zodResolver } from "@mantine/form";
 import { showNotification } from "@mantine/notifications";
 import { IconExclamationCircle } from "@tabler/icons-react";
+import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
@@ -30,7 +32,6 @@ const schema = z.object({
 
 function RouteComponent() {
     const [warningActive, setWarningActive] = useState(true);
-    const [loading, setLoading] = useState(false);
 
     const form = useForm({
         mode: "uncontrolled",
@@ -42,19 +43,11 @@ function RouteComponent() {
         validate: zodResolver(schema),
     });
 
-    const handleSubmit = async (
-        values: MakeOptional<Omit<User, "id" | "verified">, "name">,
-    ) => {
-        setLoading(true);
-
-        try {
-            const response = await fetch("/api/v1/user/new", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(values),
-            });
+    const { mutate, isPending } = useMutation({
+        mutationFn: (
+            formValues: MakeOptional<Omit<User, "id" | "verified">, "name">,
+        ) => createUser(formValues),
+        onSuccess: (response) => {
             if (response.status === 401)
                 return showNotification({
                     color: "red",
@@ -65,21 +58,20 @@ function RouteComponent() {
                     color: "red",
                     message: "Birşey ters gitti.",
                 });
-
             showNotification({
-                message: "Kullanıcı başarı ile oluşturuldu.",
+                message: "Kullanıcı oluşturuldu",
+                color: "green",
             });
             form.reset();
-        } catch (error) {
-            console.error(error);
+        },
+        onError: (error) => {
+            console.error(error.message);
             showNotification({
-                message: "Birşey ters gitti. Lütfen tekrar deneyin",
+                message: "Birşey ters gitti!",
                 color: "red",
             });
-        } finally {
-            setLoading(false);
-        }
-    };
+        },
+    });
 
     return (
         <Stack p="sm">
@@ -102,7 +94,7 @@ function RouteComponent() {
             </Alert>
             <Divider />
 
-            <form onSubmit={form.onSubmit((v) => handleSubmit(v))}>
+            <form onSubmit={form.onSubmit((v) => mutate(v))}>
                 <Stack>
                     <SimpleGrid cols={{ md: 2, xs: 1 }}>
                         <TextInput
@@ -126,7 +118,7 @@ function RouteComponent() {
                         <Button variant="default" onClick={form.reset}>
                             Sıfırla
                         </Button>
-                        <Button type="submit" loading={loading}>
+                        <Button type="submit" loading={isPending}>
                             Kaydet
                         </Button>
                     </Group>

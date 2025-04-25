@@ -1,31 +1,56 @@
-import { User, wait } from "#";
+import { User } from "#";
 import { getUsers } from "@/utils/user";
+import { CodeHighlight } from "@mantine/code-highlight";
 import { Stack, TextInput, Text } from "@mantine/core";
-import { createFileRoute, useRouterState } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { showNotification } from "@mantine/notifications";
+import { IconExclamationCircle } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 
 export const Route = createFileRoute("/users/")({
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const [users, setUsers] = useState<User[] | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useState("");
+    const [isUnVerifiedExist, setIsUnverifiedExist] = useState(false);
+    const { isPending, data: users } = useQuery({
+        queryKey: ["users"],
+        queryFn: getUsers,
+    });
 
-    useEffect(() => {
-        getUsers().then((data) => {
-            setUsers(data);
-            setLoading(false);
+    if (users && !isPending && users.some((user) => !user.verified)) {
+        showNotification({
+            message:
+                "Uyarı! Onaylanmamış kullanıcılarınız var. Sistemi kullanmasını istiyorsanız lütfen bu kullanıcıların email'lerini onaylayın",
+            color: "orange",
         });
-    }, []);
+    }
+
+    const filteredUsers = search
+        ? users?.filter((v) =>
+              [v.email, v.name]
+                  .filter((x) => x)
+                  .join(" ")
+                  .toLowerCase()
+                  .includes(search.toLowerCase()),
+          )
+        : users;
 
     return (
         <Stack>
-            <TextInput placeholder="Kullanıcı ara..." />
-            {loading ? (
+            <TextInput
+                placeholder="Kullanıcı ara..."
+                onChange={(e) => setSearch(e.target.value)}
+            />
+            {isPending ? (
                 <Text>Yükleniyor...</Text>
             ) : (
-                <pre>{JSON.stringify(users, null, 4)}</pre>
+                <CodeHighlight
+                    code={JSON.stringify(filteredUsers, null, 4)}
+                    language="json"
+                />
             )}
         </Stack>
     );

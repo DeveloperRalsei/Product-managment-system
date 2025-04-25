@@ -54,3 +54,20 @@ export const login = async (userCredentials: loginSchema) => {
 export const logout = async () => {
     return await fetch("/api/v1/auth/logout", { method: "POST" });
 };
+
+export const verifyEmailCode = async (email: string, code: string) =>
+    await fetch("/api/v1/auth/verify", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, code }),
+    });
+
+export const sendEmailVerificationCode = async (email: string) =>
+    await fetch("/api/v1/auth/send-code", {
+        method: "POST",
+        credentials: "include",
+        body: email,
+    });

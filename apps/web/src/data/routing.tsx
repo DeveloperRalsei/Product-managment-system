@@ -1,4 +1,4 @@
-import { IconUsers, TablerIconsProps } from "@tabler/icons-react";
+import { IconBook, IconUsers, TablerIconsProps } from "@tabler/icons-react";
 import { navLink } from "../types";
 import { IconHome } from "@tabler/icons-react";
 
@@ -6,7 +6,7 @@ export const links: (navLink & { icon?: React.FC<TablerIconsProps> })[] = [
     {
         label: "Kılavuz",
         path: "/",
-        icon: IconHome,
+        icon: IconBook,
     },
 
     {

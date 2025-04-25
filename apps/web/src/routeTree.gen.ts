@@ -11,18 +11,13 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as LoginImport } from './routes/login'
 import { Route as IndexImport } from './routes/index'
 import { Route as UsersIndexImport } from './routes/users/index'
+import { Route as LoginIndexImport } from './routes/login/index'
 import { Route as UsersNewImport } from './routes/users/new'
+import { Route as LoginVerifyImport } from './routes/login/verify'
 
 // Create/Update Routes
-
-const LoginRoute = LoginImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
@@ -36,9 +31,21 @@ const UsersIndexRoute = UsersIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const LoginIndexRoute = LoginIndexImport.update({
+  id: '/login/',
+  path: '/login/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const UsersNewRoute = UsersNewImport.update({
   id: '/users/new',
   path: '/users/new',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const LoginVerifyRoute = LoginVerifyImport.update({
+  id: '/login/verify',
+  path: '/login/verify',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -53,11 +60,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginImport
+    '/login/verify': {
+      id: '/login/verify'
+      path: '/login/verify'
+      fullPath: '/login/verify'
+      preLoaderRoute: typeof LoginVerifyImport
       parentRoute: typeof rootRoute
     }
     '/users/new': {
@@ -65,6 +72,13 @@ declare module '@tanstack/react-router' {
       path: '/users/new'
       fullPath: '/users/new'
       preLoaderRoute: typeof UsersNewImport
+      parentRoute: typeof rootRoute
+    }
+    '/login/': {
+      id: '/login/'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginIndexImport
       parentRoute: typeof rootRoute
     }
     '/users/': {
@@ -81,46 +95,51 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
+  '/login/verify': typeof LoginVerifyRoute
   '/users/new': typeof UsersNewRoute
+  '/login': typeof LoginIndexRoute
   '/users': typeof UsersIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
+  '/login/verify': typeof LoginVerifyRoute
   '/users/new': typeof UsersNewRoute
+  '/login': typeof LoginIndexRoute
   '/users': typeof UsersIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
+  '/login/verify': typeof LoginVerifyRoute
   '/users/new': typeof UsersNewRoute
+  '/login/': typeof LoginIndexRoute
   '/users/': typeof UsersIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/users/new' | '/users'
+  fullPaths: '/' | '/login/verify' | '/users/new' | '/login' | '/users'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/users/new' | '/users'
-  id: '__root__' | '/' | '/login' | '/users/new' | '/users/'
+  to: '/' | '/login/verify' | '/users/new' | '/login' | '/users'
+  id: '__root__' | '/' | '/login/verify' | '/users/new' | '/login/' | '/users/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  LoginRoute: typeof LoginRoute
+  LoginVerifyRoute: typeof LoginVerifyRoute
   UsersNewRoute: typeof UsersNewRoute
+  LoginIndexRoute: typeof LoginIndexRoute
   UsersIndexRoute: typeof UsersIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  LoginRoute: LoginRoute,
+  LoginVerifyRoute: LoginVerifyRoute,
   UsersNewRoute: UsersNewRoute,
+  LoginIndexRoute: LoginIndexRoute,
   UsersIndexRoute: UsersIndexRoute,
 }
 
@@ -135,19 +154,23 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/login",
+        "/login/verify",
         "/users/new",
+        "/login/",
         "/users/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/login": {
-      "filePath": "login.tsx"
+    "/login/verify": {
+      "filePath": "login/verify.tsx"
     },
     "/users/new": {
       "filePath": "users/new.tsx"
+    },
+    "/login/": {
+      "filePath": "login/index.tsx"
     },
     "/users/": {
       "filePath": "users/index.tsx"

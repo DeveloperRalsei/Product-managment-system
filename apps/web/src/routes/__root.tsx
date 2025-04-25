@@ -25,7 +25,7 @@ export const Route = createRootRoute({
     beforeLoad: async ({ location }) => {
         try {
             const auth = await isAuthenticated();
-            if (!auth && location.pathname !== "/login") {
+            if (!auth && !location.pathname.startsWith("/login")) {
                 redirectLogin(location.pathname);
             }
         } catch (err) {
@@ -37,7 +37,7 @@ export const Route = createRootRoute({
 function RootComponent() {
     const { pathname } = useLocation();
 
-    if (pathname === "/login") return <Outlet />;
+    if (pathname.startsWith("/login")) return <Outlet />;
 
     return (
         <Layout>
