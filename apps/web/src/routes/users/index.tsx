@@ -1,9 +1,7 @@
-import { User } from "#";
+import { wait } from "#";
+import { UsersTable, UserTableLoading } from "@/components/ui/UsersTable";
 import { getUsers } from "@/utils/user";
-import { CodeHighlight } from "@mantine/code-highlight";
-import { Stack, TextInput, Text } from "@mantine/core";
-import { showNotification } from "@mantine/notifications";
-import { IconExclamationCircle } from "@tabler/icons-react";
+import { Divider, Stack, TextInput, Title } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
@@ -14,23 +12,18 @@ export const Route = createFileRoute("/users/")({
 
 function RouteComponent() {
     const [search, setSearch] = useState("");
-    const [isUnVerifiedExist, setIsUnverifiedExist] = useState(false);
     const { isPending, data: users } = useQuery({
         queryKey: ["users"],
-        queryFn: getUsers,
+        queryFn: async () => {
+            await wait(5000);
+            const users = await getUsers();
+            return users;
+        },
     });
 
-    if (users && !isPending && users.some((user) => !user.verified)) {
-        showNotification({
-            message:
-                "Uyarı! Onaylanmamış kullanıcılarınız var. Sistemi kullanmasını istiyorsanız lütfen bu kullanıcıların email'lerini onaylayın",
-            color: "orange",
-        });
-    }
-
     const filteredUsers = search
-        ? users?.filter((v) =>
-              [v.email, v.name]
+        ? users?.filter((v, i) =>
+              [v.email, v.name, i + 1]
                   .filter((x) => x)
                   .join(" ")
                   .toLowerCase()
@@ -39,18 +32,17 @@ function RouteComponent() {
         : users;
 
     return (
-        <Stack>
+        <Stack p="lg">
+            <Title order={2}>Kullanıcılar</Title>
+            <Divider />
             <TextInput
                 placeholder="Kullanıcı ara..."
                 onChange={(e) => setSearch(e.target.value)}
             />
             {isPending ? (
-                <Text>Yükleniyor...</Text>
+                <UserTableLoading />
             ) : (
-                <CodeHighlight
-                    code={JSON.stringify(filteredUsers, null, 4)}
-                    language="json"
-                />
+                <UsersTable users={filteredUsers || []} />
             )}
         </Stack>
     );

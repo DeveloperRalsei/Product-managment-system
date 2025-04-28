@@ -1,6 +1,10 @@
-import { IconBook, IconUsers, TablerIconsProps } from "@tabler/icons-react";
+import {
+    IconBook,
+    IconShoppingCart,
+    IconUsers,
+    TablerIconsProps,
+} from "@tabler/icons-react";
 import { navLink } from "../types";
-import { IconHome } from "@tabler/icons-react";
 
 export const links: (navLink & { icon?: React.FC<TablerIconsProps> })[] = [
     {
@@ -20,6 +24,21 @@ export const links: (navLink & { icon?: React.FC<TablerIconsProps> })[] = [
             {
                 label: "Ekle",
                 path: "/users/new",
+            },
+        ],
+    },
+
+    {
+        label: "Ürünler",
+        icon: IconShoppingCart,
+        childs: [
+            {
+                label: "Listele",
+                path: "/products",
+            },
+            {
+                label: "Ekle",
+                path: "/products/new",
             },
         ],
     },

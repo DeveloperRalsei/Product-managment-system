@@ -4,13 +4,15 @@ import prisma from "./prisma";
 async function main() {
     const user = await prisma.user.upsert({
         where: {
-            email: "admin@example.com",
+            email: "rizayildirim126@gmail.com",
         },
         update: {},
         create: {
-            email: "admin@example.com",
-            password: encryptPassword("12341234"),
-            name: "Admin User Example",
+            email: "rizayildirim126@gmail.com",
+            password: encryptPassword("123456"),
+            name: "Rıza",
+            role: "ADMIN",
+            verified: true,
         },
     });
 

@@ -13,8 +13,10 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
 import { Route as UsersIndexImport } from './routes/users/index'
+import { Route as ProductsIndexImport } from './routes/products/index'
 import { Route as LoginIndexImport } from './routes/login/index'
 import { Route as UsersNewImport } from './routes/users/new'
+import { Route as ProductsNewImport } from './routes/products/new'
 import { Route as LoginVerifyImport } from './routes/login/verify'
 
 // Create/Update Routes
@@ -31,6 +33,12 @@ const UsersIndexRoute = UsersIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const ProductsIndexRoute = ProductsIndexImport.update({
+  id: '/products/',
+  path: '/products/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const LoginIndexRoute = LoginIndexImport.update({
   id: '/login/',
   path: '/login/',
@@ -40,6 +48,12 @@ const LoginIndexRoute = LoginIndexImport.update({
 const UsersNewRoute = UsersNewImport.update({
   id: '/users/new',
   path: '/users/new',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ProductsNewRoute = ProductsNewImport.update({
+  id: '/products/new',
+  path: '/products/new',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -67,6 +81,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginVerifyImport
       parentRoute: typeof rootRoute
     }
+    '/products/new': {
+      id: '/products/new'
+      path: '/products/new'
+      fullPath: '/products/new'
+      preLoaderRoute: typeof ProductsNewImport
+      parentRoute: typeof rootRoute
+    }
     '/users/new': {
       id: '/users/new'
       path: '/users/new'
@@ -79,6 +100,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/products/': {
+      id: '/products/'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof ProductsIndexImport
       parentRoute: typeof rootRoute
     }
     '/users/': {
@@ -96,16 +124,20 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login/verify': typeof LoginVerifyRoute
+  '/products/new': typeof ProductsNewRoute
   '/users/new': typeof UsersNewRoute
   '/login': typeof LoginIndexRoute
+  '/products': typeof ProductsIndexRoute
   '/users': typeof UsersIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login/verify': typeof LoginVerifyRoute
+  '/products/new': typeof ProductsNewRoute
   '/users/new': typeof UsersNewRoute
   '/login': typeof LoginIndexRoute
+  '/products': typeof ProductsIndexRoute
   '/users': typeof UsersIndexRoute
 }
 
@@ -113,33 +145,61 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/login/verify': typeof LoginVerifyRoute
+  '/products/new': typeof ProductsNewRoute
   '/users/new': typeof UsersNewRoute
   '/login/': typeof LoginIndexRoute
+  '/products/': typeof ProductsIndexRoute
   '/users/': typeof UsersIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login/verify' | '/users/new' | '/login' | '/users'
+  fullPaths:
+    | '/'
+    | '/login/verify'
+    | '/products/new'
+    | '/users/new'
+    | '/login'
+    | '/products'
+    | '/users'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login/verify' | '/users/new' | '/login' | '/users'
-  id: '__root__' | '/' | '/login/verify' | '/users/new' | '/login/' | '/users/'
+  to:
+    | '/'
+    | '/login/verify'
+    | '/products/new'
+    | '/users/new'
+    | '/login'
+    | '/products'
+    | '/users'
+  id:
+    | '__root__'
+    | '/'
+    | '/login/verify'
+    | '/products/new'
+    | '/users/new'
+    | '/login/'
+    | '/products/'
+    | '/users/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginVerifyRoute: typeof LoginVerifyRoute
+  ProductsNewRoute: typeof ProductsNewRoute
   UsersNewRoute: typeof UsersNewRoute
   LoginIndexRoute: typeof LoginIndexRoute
+  ProductsIndexRoute: typeof ProductsIndexRoute
   UsersIndexRoute: typeof UsersIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginVerifyRoute: LoginVerifyRoute,
+  ProductsNewRoute: ProductsNewRoute,
   UsersNewRoute: UsersNewRoute,
   LoginIndexRoute: LoginIndexRoute,
+  ProductsIndexRoute: ProductsIndexRoute,
   UsersIndexRoute: UsersIndexRoute,
 }
 
@@ -155,8 +215,10 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/login/verify",
+        "/products/new",
         "/users/new",
         "/login/",
+        "/products/",
         "/users/"
       ]
     },
@@ -166,11 +228,17 @@ export const routeTree = rootRoute
     "/login/verify": {
       "filePath": "login/verify.tsx"
     },
+    "/products/new": {
+      "filePath": "products/new.tsx"
+    },
     "/users/new": {
       "filePath": "users/new.tsx"
     },
     "/login/": {
       "filePath": "login/index.tsx"
+    },
+    "/products/": {
+      "filePath": "products/index.tsx"
     },
     "/users/": {
       "filePath": "users/index.tsx"

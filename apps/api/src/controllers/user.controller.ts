@@ -1,5 +1,4 @@
-import { Prisma } from "@prisma/client";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { User, Prisma } from "../../generated/prisma";
 import { MiddlewareHandler } from "hono";
 import prisma from "~/service/prisma";
 import { encryptPassword } from "~/utils";
@@ -18,9 +17,11 @@ export const getAllUsers: MiddlewareHandler = async (c) => {
                   }
                 : {},
             select: {
+                id: true,
                 name: true,
                 email: true,
                 verified: true,
+                role: true,
             },
         });
 
@@ -36,11 +37,7 @@ export const getAllUsers: MiddlewareHandler = async (c) => {
 
 export const createUser: MiddlewareHandler = async (c) => {
     const body = await c.req.json();
-    const {
-        name,
-        email,
-        password,
-    }: { name?: string; email: string; password: string } = body;
+    const { name, email, password, role }: Omit<User, "id" | "verified"> = body;
 
     if (!email || !password) {
         return c.json(
@@ -62,6 +59,7 @@ export const createUser: MiddlewareHandler = async (c) => {
                 name,
                 email,
                 password: encryptPassword(password),
+                role,
             },
         });
 
@@ -74,7 +72,7 @@ export const createUser: MiddlewareHandler = async (c) => {
         );
     } catch (error) {
         const message =
-            error instanceof PrismaClientKnownRequestError
+            error instanceof Prisma.PrismaClientKnownRequestError
                 ? error.message
                 : JSON.stringify(error);
         return c.json({

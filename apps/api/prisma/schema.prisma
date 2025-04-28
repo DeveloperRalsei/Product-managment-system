@@ -1,6 +1,6 @@
 generator client {
     provider = "prisma-client-js"
-    output   = "./generated/client"
+    output   = "../generated/prisma"
 }
 
 datasource db {
@@ -10,16 +10,16 @@ datasource db {
 
 model User {
     id                       String    @id @default(auto()) @map("_id") @db.ObjectId
-    name                     String?
     email                    String    @unique
-    password                 String
-    verified                 Boolean   @default(false)
-    role                     Role      @default(USER)
     emailVerificationCode    String?
-    emailVerificationExpires DateTime?
+    emailVerificationExpires DateTime? @db.Date
+    name                     String
+    password                 String
+    role                     Role      @default(USER)
+    verified                 Boolean?
 }
 
 enum Role {
-    ADMIN
     USER
+    ADMIN
 }

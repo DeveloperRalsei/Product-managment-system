@@ -7,8 +7,10 @@ import {
     Divider,
     Group,
     PasswordInput,
+    Select,
     SimpleGrid,
     Stack,
+    Text,
     TextInput,
     Title,
 } from "@mantine/core";
@@ -28,25 +30,44 @@ const schema = z.object({
     name: z.string().optional(),
     email: z.string().email("Lütfen geçerli bir email adresi girin"),
     password: z.string().min(6, "Şifre en az 6 karakter olmalı"),
+    passwordAgain: z.string(),
+    role: z.literal<User["role"]>("USER"),
 });
 
 function RouteComponent() {
     const [warningActive, setWarningActive] = useState(true);
+    const [roleWarning, setRoleWarning] = useState(false);
 
-    const form = useForm({
+    const form = useForm<
+        Omit<User, "id" | "verified"> & { passwordAgain: string }
+    >({
         mode: "uncontrolled",
         initialValues: {
             name: "",
             email: "",
             password: "",
+            passwordAgain: "",
+            role: "USER",
         },
-        validate: zodResolver(schema),
+        validate: {
+            passwordAgain: (v, { password }) =>
+                v !== password ? "Şifre ile aynı olmak zorunda!" : null,
+            ...zodResolver(schema),
+        },
+        onValuesChange: ({ role }) => {
+            if (role === "ADMIN") setRoleWarning(true);
+            else setRoleWarning(false);
+        },
     });
 
     const { mutate, isPending } = useMutation({
-        mutationFn: (
-            formValues: MakeOptional<Omit<User, "id" | "verified">, "name">,
-        ) => createUser(formValues),
+        mutationFn: (formValues: Omit<User, "id" | "verified">) =>
+            createUser({
+                name: formValues.name,
+                email: formValues.email,
+                password: formValues.password,
+                role: formValues.role,
+            }),
         onSuccess: (response) => {
             if (response.status === 401)
                 return showNotification({
@@ -112,6 +133,35 @@ function RouteComponent() {
                             placeholder="******"
                             label="Şifre"
                             {...form.getInputProps("password")}
+                        />
+                        <PasswordInput
+                            required
+                            placeholder="******"
+                            label="Şifre tekrar"
+                            {...form.getInputProps("passwordAgain")}
+                        />
+                        <Select
+                            label="Rol"
+                            description={
+                                roleWarning ? (
+                                    <Text c="yellow">
+                                        Uyarı! Bu kullanıcıya "admin" rolü
+                                        vermek tüm sisteme erişebilmesine olanak
+                                        sağlıyacaktır
+                                    </Text>
+                                ) : undefined
+                            }
+                            data={[
+                                {
+                                    label: "Kullanıcı",
+                                    value: "USER",
+                                },
+                                {
+                                    label: "Admin",
+                                    value: "ADMIN",
+                                },
+                            ]}
+                            {...form.getInputProps("role")}
                         />
                     </SimpleGrid>
                     <Group>

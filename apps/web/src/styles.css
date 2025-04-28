@@ -3,6 +3,7 @@
     text-decoration: none;
     position: absolute;
     margin-left: 0.5rem;
+    scroll-margin-top: 100px;
 }
 
 .custom-anchor-icon {

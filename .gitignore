@@ -2,8 +2,7 @@ node_modules
 .DS_Store
 dist
 
-apps/api/prisma/generated
-
+generated
 # local env files
 .env
 .env*

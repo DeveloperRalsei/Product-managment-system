@@ -4,9 +4,11 @@
     "scripts": {
         "client:dev": "cd apps/web && pnpm dev",
         "client:build": "cd apps/web && pnpm build",
+        "client:preview": "cd apps/web && pnpm preview",
         "server:dev": "cd apps/api && pnpm dev",
         "dev": "concurrently \"pnpm run client:dev\" \"pnpm run server:dev\""
     },
+    "packageManager": "pnpm@10.9.0",
     "workspaces": [
         "apps/*"
     ],
