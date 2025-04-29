@@ -9,10 +9,11 @@ import {
 } from "@mantine/core";
 import { IconCheck, IconPencil, IconTrash, IconX } from "@tabler/icons-react";
 import { openConfirmModal } from "@mantine/modals";
-import { deleteUserById } from "@/utils/user";
+import { activateUser, deleteUserById } from "@/utils/user";
 import { nprogress } from "@mantine/nprogress";
 import { showNotification } from "@mantine/notifications";
 import { Link } from "@tanstack/react-router";
+import { useState } from "react";
 
 const roleValues: Record<User["role"], string> = {
     USER: "Kullanıcı",
@@ -26,6 +27,8 @@ export const UsersTable = ({
     users: User[];
     refetchFunction: () => void;
 }) => {
+    const [loading, setLoading] = useState(false);
+
     const sortedUsers = users.sort((u1, u2) => {
         if (u1.deleted && !u2.deleted) return 1;
         if (!u1.deleted && u2.deleted) return -1;
@@ -42,35 +45,6 @@ export const UsersTable = ({
 
         return 0;
     });
-
-    const handleDelete = (id: string, nameOrEmail: string) => {
-        const isEmail = nameOrEmail.includes("@");
-        openConfirmModal({
-            title: isEmail
-                ? "Şu emaile sahip kullanıcıyı silmek istiyormusunuz?"
-                : "Şu kullanıcıyı silmek istiyormusunuz?",
-            children: (
-                <Stack>
-                    {nameOrEmail}
-                    <Text>
-                        Bu işlem kullanıcı kullanımını etkisiz hale getirir.
-                        İstediğiniz zaman tekrar aktif hale getirebilirsiniz.
-                    </Text>
-                </Stack>
-            ),
-            confirmProps: { color: "red" },
-            async onConfirm() {
-                nprogress.start();
-                await deleteUserById("delete", id);
-                nprogress.complete();
-                showNotification({
-                    message: "Kullanıcı Silindi",
-                    color: "green",
-                });
-                refetchFunction();
-            },
-        });
-    };
 
     const handlePermanentDelete = (id: string, nameOrEmail: string) => {
         const isEmail = nameOrEmail.includes("@");
@@ -93,12 +67,14 @@ export const UsersTable = ({
             confirmProps: { color: "red" },
             async onConfirm() {
                 nprogress.start();
+                setLoading(true);
                 await deleteUserById("permanent", id);
                 nprogress.complete();
                 showNotification({
                     message: "Kullanıcı Silindi",
                     color: "green",
                 });
+                setLoading(false);
                 refetchFunction();
             },
         });
@@ -153,7 +129,16 @@ export const UsersTable = ({
                                     {u.deleted ? (
                                         <Tooltip label="Aktive Et">
                                             <ActionIcon
+                                                onClick={async () => {
+                                                    setLoading(true);
+                                                    nprogress.start();
+                                                    await activateUser(u.id);
+                                                    nprogress.complete();
+                                                    setLoading(false);
+                                                    refetchFunction();
+                                                }}
                                                 size="lg"
+                                                loading={loading}
                                                 display={
                                                     !u.deleted
                                                         ? "none"
@@ -166,14 +151,20 @@ export const UsersTable = ({
                                     ) : (
                                         <Tooltip label="Sil">
                                             <ActionIcon
-                                                onClick={() =>
-                                                    handleDelete(
-                                                        u.id as string,
-                                                        u.name || u.email,
-                                                    )
-                                                }
+                                                onClick={async () => {
+                                                    nprogress.start();
+                                                    setLoading(true);
+                                                    await deleteUserById(
+                                                        "delete",
+                                                        u.id,
+                                                    );
+                                                    nprogress.complete();
+                                                    setLoading(false);
+                                                    refetchFunction();
+                                                }}
                                                 size="lg"
                                                 color="red"
+                                                loading={loading}
                                                 display={
                                                     u.deleted
                                                         ? "none"
@@ -192,6 +183,7 @@ export const UsersTable = ({
                                                     u.name || u.email,
                                                 )
                                             }
+                                            loading={loading}
                                             color="dark.9"
                                             size="lg"
                                         >

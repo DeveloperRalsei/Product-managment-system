@@ -3,6 +3,15 @@ import { MiddlewareHandler } from "hono";
 import prisma from "~/service/prisma";
 import { encryptPassword } from "~/utils";
 
+const defaultSelectValues = {
+    id: true,
+    name: true,
+    email: true,
+    verified: true,
+    role: true,
+    deleted: true,
+};
+
 export const getAllUsers: MiddlewareHandler = async (c) => {
     const { q } = c.req.query();
 
@@ -16,16 +25,8 @@ export const getAllUsers: MiddlewareHandler = async (c) => {
                       ],
                   }
                 : {},
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                verified: true,
-                role: true,
-                deleted: true,
-            },
+            select: defaultSelectValues,
         });
-
         return c.json(users);
     } catch (error) {
         const message =
@@ -33,6 +34,25 @@ export const getAllUsers: MiddlewareHandler = async (c) => {
                 ? "Something went wrong while trying to get users"
                 : error;
         return c.json({ message, error }, 500);
+    }
+};
+
+export const getUser: MiddlewareHandler = async (c) => {
+    const emailOrId = c.req.param("email_or_id");
+    if (!emailOrId) return c.json({ message: "Email or ID required" }, 400);
+
+    const isEmail = emailOrId.includes("@");
+    const identifier = isEmail ? { email: emailOrId } : { id: emailOrId };
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: identifier,
+            select: defaultSelectValues,
+        });
+        if (!user) return c.json({ message: "User not found" }, 404);
+        return c.json(user);
+    } catch (error) {
+        return c.json({ error }, 400);
     }
 };
 
@@ -69,6 +89,7 @@ export const createUser: MiddlewareHandler = async (c) => {
                     ? { ...userData, deleted: false }
                     : {},
             where: { email },
+            select: defaultSelectValues,
         });
 
         return c.json(
@@ -101,22 +122,17 @@ export const deleteUser: MiddlewareHandler = async (c) => {
     const isEmail = param.includes("@");
     const identifier = isEmail ? { email: param } : { id: param };
     const isPermanent = permanently === "1";
-    const selector = {
-        id: true,
-        name: true,
-        email: true,
-        phoneNumber: true,
-        role: true,
-        verified: true,
-    };
 
     try {
         const user = isPermanent
-            ? await prisma.user.delete({ where: identifier, select: selector })
+            ? await prisma.user.delete({
+                  where: identifier,
+                  select: defaultSelectValues,
+              })
             : await prisma.user.update({
                   where: identifier,
                   data: { deleted: true },
-                  select: selector,
+                  select: defaultSelectValues,
               });
         return c.json({ message: "User deleted", user }, 202);
     } catch (error) {
@@ -146,15 +162,7 @@ export const editUser: MiddlewareHandler = async (c) => {
                 deleted,
                 verified: email ? false : undefined,
             },
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                phoneNumber: true,
-                role: true,
-                verified: true,
-                deleted: true,
-            },
+            select: defaultSelectValues,
         });
 
         return c.json({ message: "User updated", user: updatedUser });
