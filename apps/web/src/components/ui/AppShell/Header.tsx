@@ -1,5 +1,6 @@
 import { AppShellHeader, Burger, Group, Text } from "@mantine/core";
 import { ColorSchemeToggle } from "..";
+import { FullscreenToggle } from "../FullScreenToggle";
 
 export const Header = ({
     navbar,
@@ -16,7 +17,10 @@ export const Header = ({
                 />
                 <Text fz={"h2"}>App</Text>
             </Group>
-            <ColorSchemeToggle />
+            <Group>
+                <FullscreenToggle />
+                <ColorSchemeToggle />
+            </Group>
         </Group>
     </AppShellHeader>
 );

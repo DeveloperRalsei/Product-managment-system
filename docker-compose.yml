@@ -1,0 +1,36 @@
+services:
+    # db:
+    #     image: mongo:8.0
+    #     restart: always
+    #     environment:
+    #         MONGO_INITDB_ROOT_USERNAME: root
+    #     ports:
+    #         - 27017:27017
+    api:
+        build:
+            context: .
+            dockerfile: ./api.Dockerfile
+        # depends_on:
+        #     - db
+        ports:
+            - "3000:3000"
+        env_file: ./apps/api/.env
+        volumes:
+            - ./apps/shared:/app/apps/shared
+            - ./apps/api:/app/apps/api
+
+    web:
+        build:
+            context: .
+            dockerfile: ./web.Dockerfile
+        depends_on:
+            - api
+        ports:
+            - "4173:4173"
+        env_file: ./apps/web/.env
+        volumes:
+            - ./apps/web:/app/apps/web
+            - ./apps/shared:/app/apps/shared
+
+volumes:
+    data:

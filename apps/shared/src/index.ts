@@ -4,7 +4,7 @@ export * from "./zodSchemas";
 export type Role = "ADMIN" | "USER";
 
 export type User = {
-    id: number | string;
+    id: string;
     name?: string;
     email: string;
     password: string;
@@ -12,6 +12,7 @@ export type User = {
     verified: boolean;
     emailVerificationCode?: string;
     emailVerificationExpires?: Date;
+    deleted: boolean;
 };
 
 export type loginSchema = {

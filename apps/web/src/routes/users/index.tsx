@@ -2,6 +2,7 @@ import { wait } from "#";
 import { UsersTable, UserTableLoading } from "@/components/ui/UsersTable";
 import { getUsers } from "@/utils/user";
 import { Divider, Stack, TextInput, Title } from "@mantine/core";
+import { nprogress } from "@mantine/nprogress";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
@@ -12,11 +13,16 @@ export const Route = createFileRoute("/users/")({
 
 function RouteComponent() {
     const [search, setSearch] = useState("");
-    const { isPending, data: users } = useQuery({
+    const {
+        isPending,
+        data: users,
+        refetch,
+    } = useQuery({
         queryKey: ["users"],
         queryFn: async () => {
-            await wait(5000);
+            nprogress.start();
             const users = await getUsers();
+            nprogress.complete();
             return users;
         },
     });
@@ -42,7 +48,10 @@ function RouteComponent() {
             {isPending ? (
                 <UserTableLoading />
             ) : (
-                <UsersTable users={filteredUsers || []} />
+                <UsersTable
+                    users={filteredUsers || []}
+                    refetchFunction={refetch}
+                />
             )}
         </Stack>
     );

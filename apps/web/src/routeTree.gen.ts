@@ -18,6 +18,7 @@ import { Route as LoginIndexImport } from './routes/login/index'
 import { Route as UsersNewImport } from './routes/users/new'
 import { Route as ProductsNewImport } from './routes/products/new'
 import { Route as LoginVerifyImport } from './routes/login/verify'
+import { Route as UsersEditIdImport } from './routes/users/edit.$id'
 
 // Create/Update Routes
 
@@ -60,6 +61,12 @@ const ProductsNewRoute = ProductsNewImport.update({
 const LoginVerifyRoute = LoginVerifyImport.update({
   id: '/login/verify',
   path: '/login/verify',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const UsersEditIdRoute = UsersEditIdImport.update({
+  id: '/users/edit/$id',
+  path: '/users/edit/$id',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -116,6 +123,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UsersIndexImport
       parentRoute: typeof rootRoute
     }
+    '/users/edit/$id': {
+      id: '/users/edit/$id'
+      path: '/users/edit/$id'
+      fullPath: '/users/edit/$id'
+      preLoaderRoute: typeof UsersEditIdImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -129,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginIndexRoute
   '/products': typeof ProductsIndexRoute
   '/users': typeof UsersIndexRoute
+  '/users/edit/$id': typeof UsersEditIdRoute
 }
 
 export interface FileRoutesByTo {
@@ -139,6 +154,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginIndexRoute
   '/products': typeof ProductsIndexRoute
   '/users': typeof UsersIndexRoute
+  '/users/edit/$id': typeof UsersEditIdRoute
 }
 
 export interface FileRoutesById {
@@ -150,6 +166,7 @@ export interface FileRoutesById {
   '/login/': typeof LoginIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/users/': typeof UsersIndexRoute
+  '/users/edit/$id': typeof UsersEditIdRoute
 }
 
 export interface FileRouteTypes {
@@ -162,6 +179,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/products'
     | '/users'
+    | '/users/edit/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -171,6 +189,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/products'
     | '/users'
+    | '/users/edit/$id'
   id:
     | '__root__'
     | '/'
@@ -180,6 +199,7 @@ export interface FileRouteTypes {
     | '/login/'
     | '/products/'
     | '/users/'
+    | '/users/edit/$id'
   fileRoutesById: FileRoutesById
 }
 
@@ -191,6 +211,7 @@ export interface RootRouteChildren {
   LoginIndexRoute: typeof LoginIndexRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
   UsersIndexRoute: typeof UsersIndexRoute
+  UsersEditIdRoute: typeof UsersEditIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -201,6 +222,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginIndexRoute: LoginIndexRoute,
   ProductsIndexRoute: ProductsIndexRoute,
   UsersIndexRoute: UsersIndexRoute,
+  UsersEditIdRoute: UsersEditIdRoute,
 }
 
 export const routeTree = rootRoute
@@ -219,7 +241,8 @@ export const routeTree = rootRoute
         "/users/new",
         "/login/",
         "/products/",
-        "/users/"
+        "/users/",
+        "/users/edit/$id"
       ]
     },
     "/": {
@@ -242,6 +265,9 @@ export const routeTree = rootRoute
     },
     "/users/": {
       "filePath": "users/index.tsx"
+    },
+    "/users/edit/$id": {
+      "filePath": "users/edit.$id.tsx"
     }
   }
 }

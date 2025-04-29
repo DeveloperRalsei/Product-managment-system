@@ -1,15 +1,17 @@
-import server from "./app";
 import { serve } from "@hono/node-server";
 import { validateEnv } from "./utils";
 import { config } from "dotenv";
 
 config({ path: "../.env" });
+const missingEnvVariables = validateEnv();
 
-if (!validateEnv())
+if (missingEnvVariables)
     throw new Error(
-        "You didn't provide all the environment variables: PORT, JWT_TOKEN, DATABASE_URL",
+        "You didn't provide all the environment variables: " +
+            missingEnvVariables,
     );
 
+import server from "./app";
 const port = Number(process.env.PORT);
 serve({ fetch: server.fetch, port }, (info) =>
     console.log(

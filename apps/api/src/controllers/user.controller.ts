@@ -22,6 +22,7 @@ export const getAllUsers: MiddlewareHandler = async (c) => {
                 email: true,
                 verified: true,
                 role: true,
+                deleted: true,
             },
         });
 
@@ -52,15 +53,22 @@ export const createUser: MiddlewareHandler = async (c) => {
     try {
         const userFound = await prisma.user.findFirst({ where: { email } });
 
-        if (userFound) return c.json({ message: "Email already in use" }, 409);
+        if (userFound && !userFound.deleted)
+            return c.json({ message: "Email already in use" }, 409);
 
-        const newUser = await prisma.user.create({
-            data: {
-                name,
-                email,
-                password: encryptPassword(password),
-                role,
-            },
+        const userData = {
+            name,
+            email,
+            password: encryptPassword(password),
+            role,
+        };
+        const newUser = await prisma.user.upsert({
+            create: userData,
+            update:
+                userFound && userFound.deleted
+                    ? { ...userData, deleted: false }
+                    : {},
+            where: { email },
         });
 
         return c.json(
@@ -79,5 +87,78 @@ export const createUser: MiddlewareHandler = async (c) => {
             message,
             error,
         });
+    }
+};
+
+export const deleteUser: MiddlewareHandler = async (c) => {
+    const param = c.req.param("email_or_id");
+    const permanently = c.req.query("permanently");
+
+    if (!param) {
+        return c.json({ message: "Email or ID required" }, 400);
+    }
+
+    const isEmail = param.includes("@");
+    const identifier = isEmail ? { email: param } : { id: param };
+    const isPermanent = permanently === "1";
+    const selector = {
+        id: true,
+        name: true,
+        email: true,
+        phoneNumber: true,
+        role: true,
+        verified: true,
+    };
+
+    try {
+        const user = isPermanent
+            ? await prisma.user.delete({ where: identifier, select: selector })
+            : await prisma.user.update({
+                  where: identifier,
+                  data: { deleted: true },
+                  select: selector,
+              });
+        return c.json({ message: "User deleted", user }, 202);
+    } catch (error) {
+        return c.json({ error }, 400);
+    }
+};
+
+export const editUser: MiddlewareHandler = async (c) => {
+    const param = c.req.param("email_or_id");
+    if (!param) {
+        return c.json({ message: "Email or ID required" }, 400);
+    }
+
+    const { name, email, password, phoneNumber, role, deleted } =
+        await c.req.json();
+    const identifier = param.includes("@") ? { email: param } : { id: param };
+
+    try {
+        const updatedUser = await prisma.user.update({
+            where: identifier,
+            data: {
+                name,
+                email,
+                password: password ? encryptPassword(password) : undefined,
+                phoneNumber,
+                role,
+                deleted,
+                verified: email ? false : undefined,
+            },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                phoneNumber: true,
+                role: true,
+                verified: true,
+                deleted: true,
+            },
+        });
+
+        return c.json({ message: "User updated", user: updatedUser });
+    } catch (error) {
+        return c.json({ error: "User not found or update failed" }, 400);
     }
 };

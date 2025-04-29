@@ -34,13 +34,16 @@ const schema = z.object({
     role: z.literal<User["role"]>("USER"),
 });
 
+type UserFormValues = MakeOptional<
+    Omit<User, "id" | "verified" | "deleted">,
+    "name"
+>;
+
 function RouteComponent() {
     const [warningActive, setWarningActive] = useState(true);
     const [roleWarning, setRoleWarning] = useState(false);
 
-    const form = useForm<
-        Omit<User, "id" | "verified"> & { passwordAgain: string }
-    >({
+    const form = useForm<UserFormValues & { passwordAgain: string }>({
         mode: "uncontrolled",
         initialValues: {
             name: "",
@@ -61,7 +64,7 @@ function RouteComponent() {
     });
 
     const { mutate, isPending } = useMutation({
-        mutationFn: (formValues: Omit<User, "id" | "verified">) =>
+        mutationFn: (formValues: UserFormValues) =>
             createUser({
                 name: formValues.name,
                 email: formValues.email,
@@ -73,6 +76,11 @@ function RouteComponent() {
                 return showNotification({
                     color: "red",
                     message: "Kullanıcı oluşturulamadı. Buna yetkiniz yok",
+                });
+            if (response.status === 409)
+                return showNotification({
+                    message: "Bu email zaten kullanım da",
+                    color: "red",
                 });
             if (!response.ok)
                 return showNotification({
