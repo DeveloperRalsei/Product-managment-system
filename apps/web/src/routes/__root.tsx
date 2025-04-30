@@ -1,5 +1,6 @@
 import {
     createRootRoute,
+    HeadContent,
     Outlet,
     redirect,
     useLocation,
@@ -7,6 +8,7 @@ import {
 import { Layout, NotFoundComponent } from "../components";
 import { isAuthenticated } from "@/utils/auth";
 import { ErrorComponent } from "@/components/ui/page/ErrorComponent";
+import { BreadCrumbs } from "@/components/ui/page/BreadCrumbs";
 
 function redirectLogin(redirectPath: string = "/") {
     throw redirect({
@@ -40,8 +42,12 @@ function RootComponent() {
     if (pathname.startsWith("/login")) return <Outlet />;
 
     return (
-        <Layout>
-            <Outlet />
-        </Layout>
+        <>
+            <HeadContent />
+            <Layout>
+                <BreadCrumbs m="lg" />
+                <Outlet />
+            </Layout>
+        </>
     );
 }

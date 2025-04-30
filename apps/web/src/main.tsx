@@ -14,6 +14,7 @@ import "@mantine/notifications/styles.css";
 import "@mantine/code-highlight/styles.css";
 import "@mantine/nprogress/styles.css";
 import "./styles.css";
+import { BreadCrumbsProvider } from "./components/ui/page/BreadCrumbs";
 
 const router = createRouter({ routeTree });
 
@@ -38,9 +39,11 @@ createRoot(document.getElementById("app")!).render(
                 }}
             >
                 <QueryClientProvider client={queryClient}>
-                    <NavigationProgress />
-                    <RouterProvider router={router} />
-                    <Notifications />
+                    <BreadCrumbsProvider>
+                        <NavigationProgress />
+                        <RouterProvider router={router} />
+                        <Notifications />
+                    </BreadCrumbsProvider>
                 </QueryClientProvider>
             </ModalsProvider>
         </MantineProvider>

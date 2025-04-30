@@ -9,8 +9,6 @@ COPY ./tsconfig*.json ./
 COPY ./apps/api ./apps/api
 COPY ./apps/shared ./apps/shared
 
-RUN pnpm install --frozen-lockfile
-
-RUN pnpx prisma generate --schema=./apps/api/prisma/schema.prisma
+RUN pnpm install --frozen-lockfile && pnpx prisma generate --schema=./apps/api/prisma/schema.prisma
 
 CMD [ "pnpm", "server:dev" ]

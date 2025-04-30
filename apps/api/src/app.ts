@@ -3,6 +3,7 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { v1Router } from "./routes";
 import { AuthUser } from "./types";
+import { serveStatic } from "@hono/node-server/serve-static";
 
 type Variables = { user: AuthUser };
 const app = new Hono<{ Variables: Variables }>();
@@ -19,5 +20,6 @@ app.use(
     logger(),
 );
 app.route("/api/v1", v1Router);
+app.get("/static/*", serveStatic({ root: "./" }));
 
 export default app;

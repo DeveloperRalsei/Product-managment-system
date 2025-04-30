@@ -1,10 +1,12 @@
 import { UserForm, UserFormValues } from "@/components/form/user";
+import { useBreadCrumbs } from "@/components/ui/page/BreadCrumbs";
 import { getUserById, updateUser } from "@/utils/user";
 import { Alert, Divider, Stack, Title } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import { IconExclamationCircle } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/users/edit/$id")({
     component: RouteComponent,
@@ -13,7 +15,20 @@ export const Route = createFileRoute("/users/edit/$id")({
 });
 
 function RouteComponent() {
+    const { change } = useBreadCrumbs();
     const user = Route.useLoaderData();
+
+    useEffect(() => {
+        change([
+            { label: "Kullanıcılar", to: "/users" },
+            {
+                label: "Düzenle",
+                to: "/users/edit/$id",
+                params: { id: user.id },
+            },
+        ]);
+    }, []);
+
     const { mutate, isPending } = useMutation({
         mutationFn: (values: UserFormValues) => updateUser(user.id, values),
         onSuccess: (response) => {

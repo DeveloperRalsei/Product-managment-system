@@ -1,9 +1,13 @@
 import { wait } from "#";
 import { sendEmailVerificationCode, verifyEmailCode } from "@/utils/auth";
-import { Button, PinInput, Stack, Title } from "@mantine/core";
+import { Button, LoadingOverlay, PinInput, Stack, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { showNotification } from "@mantine/notifications";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import {
+    createFileRoute,
+    useNavigate,
+    useRouterState,
+} from "@tanstack/react-router";
 import { useState } from "react";
 
 export const Route = createFileRoute("/login/verify")({
@@ -18,10 +22,12 @@ export const Route = createFileRoute("/login/verify")({
         }
         await sendEmailVerificationCode(email);
     },
+    pendingComponent: () => "Yükleniyor",
 });
 
 function VerifyComponent() {
     const { redirect } = Route.useSearch();
+    const { isLoading: isRouterLoading } = useRouterState();
     const navigate = useNavigate();
     const form = useForm({
         initialValues: {
@@ -58,12 +64,13 @@ function VerifyComponent() {
 
     return (
         <Stack h="100vh" align="center" justify="center">
+            <LoadingOverlay visible={loading || isRouterLoading} />
             <Title order={2} ta="center">
                 Emaili Doğrula
             </Title>
             <form onSubmit={form.onSubmit(handleSubmit)}>
                 <PinInput length={6} {...form.getInputProps("code")} />
-                <Button type="submit" loading={loading}>
+                <Button type="submit" loading={loading} mt="sm" fullWidth>
                     Gönder
                 </Button>
             </form>

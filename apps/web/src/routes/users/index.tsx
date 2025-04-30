@@ -1,11 +1,11 @@
-import { wait } from "#";
-import { UsersTable, UserTableLoading } from "@/components/ui/UsersTable";
+import { useBreadCrumbs } from "@/components/ui/page/BreadCrumbs";
+import { UsersTable, UserTableLoading } from "@/components/ui/users/UsersTable";
 import { getUsers } from "@/utils/user";
-import { Divider, Stack, TextInput, Title } from "@mantine/core";
+import { Divider, Stack, TextInput } from "@mantine/core";
 import { nprogress } from "@mantine/nprogress";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/users/")({
     component: RouteComponent,
@@ -13,6 +13,10 @@ export const Route = createFileRoute("/users/")({
 
 function RouteComponent() {
     const [search, setSearch] = useState("");
+    const { change } = useBreadCrumbs();
+    useEffect(() => {
+        change([{ label: "Kullanıcılar", to: "/users" }]);
+    }, []);
     const {
         isPending,
         data: users,
@@ -38,21 +42,22 @@ function RouteComponent() {
         : users;
 
     return (
-        <Stack p="lg">
-            <Title order={2}>Kullanıcılar</Title>
+        <>
             <Divider />
-            <TextInput
-                placeholder="Kullanıcı ara..."
-                onChange={(e) => setSearch(e.target.value)}
-            />
-            {isPending ? (
-                <UserTableLoading />
-            ) : (
-                <UsersTable
-                    users={filteredUsers || []}
-                    refetchFunction={refetch}
+            <Stack p="lg">
+                <TextInput
+                    placeholder="Kullanıcı ara..."
+                    onChange={(e) => setSearch(e.target.value)}
                 />
-            )}
-        </Stack>
+                {isPending ? (
+                    <UserTableLoading />
+                ) : (
+                    <UsersTable
+                        users={filteredUsers || []}
+                        refetchFunction={refetch}
+                    />
+                )}
+            </Stack>
+        </>
     );
 }

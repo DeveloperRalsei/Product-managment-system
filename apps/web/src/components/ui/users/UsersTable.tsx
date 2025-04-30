@@ -7,13 +7,20 @@ import {
     Text,
     Tooltip,
 } from "@mantine/core";
-import { IconCheck, IconPencil, IconTrash, IconX } from "@tabler/icons-react";
-import { openConfirmModal } from "@mantine/modals";
+import {
+    IconCheck,
+    IconPencil,
+    IconSquareCheck,
+    IconTrash,
+    IconX,
+} from "@tabler/icons-react";
+import { openConfirmModal, openModal } from "@mantine/modals";
 import { activateUser, deleteUserById } from "@/utils/user";
 import { nprogress } from "@mantine/nprogress";
 import { showNotification } from "@mantine/notifications";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { VerificationCodeEntry } from "./VerificationCodeEntry";
 
 const roleValues: Record<User["role"], string> = {
     USER: "Kullanıcı",
@@ -45,6 +52,20 @@ export const UsersTable = ({
 
         return 0;
     });
+
+    const handleVerification = () => {
+        openModal({
+            title: "Doğrula",
+            children: (
+                <>
+                    <Text>
+                        Kayıtlı E-mail'e gönderdiğimiz 6 haneli kodu giriniz
+                    </Text>
+                    <VerificationCodeEntry />
+                </>
+            ),
+        });
+    };
 
     const handlePermanentDelete = (id: string, nameOrEmail: string) => {
         const isEmail = nameOrEmail.includes("@");
@@ -126,6 +147,19 @@ export const UsersTable = ({
                                             <IconPencil />
                                         </ActionIcon>
                                     </Tooltip>
+                                    {!u.verified && (
+                                        <Tooltip label="Doğrula">
+                                            <ActionIcon
+                                                onClick={async () =>
+                                                    handleVerification()
+                                                }
+                                                color="grape"
+                                                size="lg"
+                                            >
+                                                <IconSquareCheck />
+                                            </ActionIcon>
+                                        </Tooltip>
+                                    )}
                                     {u.deleted ? (
                                         <Tooltip label="Aktive Et">
                                             <ActionIcon

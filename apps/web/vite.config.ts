@@ -24,5 +24,17 @@ export default defineConfig(({ mode }) => {
                 },
             },
         },
+        build: {
+            chunkSizeWarningLimit: 1000,
+            rollupOptions: {
+                output: {
+                    manualChunks(config) {
+                        if (config.includes("node_modules")) {
+                            return "vendor";
+                        }
+                    },
+                },
+            },
+        },
     };
 });
