@@ -12,10 +12,8 @@ export const createUser = async (
         body: JSON.stringify(values),
     });
 
-export const getUsers = async (searchString?: string): Promise<User[]> =>
-    (
-        await fetch(`/api/v1/user${searchString ? `?q=${searchString}` : ""}`)
-    ).json();
+export const getUsers = async (searchString?: string) =>
+    await fetch(`/api/v1/user${searchString ? `?q=${searchString}` : ""}`);
 
 export const getUserById = async (id: string): Promise<User> =>
     (await fetch(`/api/v1/user/${id}`)).json();

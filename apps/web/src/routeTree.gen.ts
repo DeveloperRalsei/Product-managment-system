@@ -11,6 +11,7 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as WsTestImport } from './routes/wsTest'
 import { Route as IndexImport } from './routes/index'
 import { Route as UsersIndexImport } from './routes/users/index'
 import { Route as ProductsIndexImport } from './routes/products/index'
@@ -21,6 +22,12 @@ import { Route as LoginVerifyImport } from './routes/login/verify'
 import { Route as UsersEditIdImport } from './routes/users/edit.$id'
 
 // Create/Update Routes
+
+const WsTestRoute = WsTestImport.update({
+  id: '/wsTest',
+  path: '/wsTest',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
@@ -81,6 +88,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/wsTest': {
+      id: '/wsTest'
+      path: '/wsTest'
+      fullPath: '/wsTest'
+      preLoaderRoute: typeof WsTestImport
+      parentRoute: typeof rootRoute
+    }
     '/login/verify': {
       id: '/login/verify'
       path: '/login/verify'
@@ -137,6 +151,7 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/wsTest': typeof WsTestRoute
   '/login/verify': typeof LoginVerifyRoute
   '/products/new': typeof ProductsNewRoute
   '/users/new': typeof UsersNewRoute
@@ -148,6 +163,7 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/wsTest': typeof WsTestRoute
   '/login/verify': typeof LoginVerifyRoute
   '/products/new': typeof ProductsNewRoute
   '/users/new': typeof UsersNewRoute
@@ -160,6 +176,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/wsTest': typeof WsTestRoute
   '/login/verify': typeof LoginVerifyRoute
   '/products/new': typeof ProductsNewRoute
   '/users/new': typeof UsersNewRoute
@@ -173,6 +190,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/wsTest'
     | '/login/verify'
     | '/products/new'
     | '/users/new'
@@ -183,6 +201,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/wsTest'
     | '/login/verify'
     | '/products/new'
     | '/users/new'
@@ -193,6 +212,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/wsTest'
     | '/login/verify'
     | '/products/new'
     | '/users/new'
@@ -205,6 +225,7 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  WsTestRoute: typeof WsTestRoute
   LoginVerifyRoute: typeof LoginVerifyRoute
   ProductsNewRoute: typeof ProductsNewRoute
   UsersNewRoute: typeof UsersNewRoute
@@ -216,6 +237,7 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  WsTestRoute: WsTestRoute,
   LoginVerifyRoute: LoginVerifyRoute,
   ProductsNewRoute: ProductsNewRoute,
   UsersNewRoute: UsersNewRoute,
@@ -236,6 +258,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/wsTest",
         "/login/verify",
         "/products/new",
         "/users/new",
@@ -247,6 +270,9 @@ export const routeTree = rootRoute
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/wsTest": {
+      "filePath": "wsTest.tsx"
     },
     "/login/verify": {
       "filePath": "login/verify.tsx"

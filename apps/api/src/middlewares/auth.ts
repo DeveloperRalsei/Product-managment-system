@@ -20,7 +20,7 @@ export const withAuth: MiddlewareHandler = async (c, next) => {
     }
 };
 
-export const WithRole = (requiredRole: User["role"]): MiddlewareHandler => {
+export const withRole = (requiredRole: User["role"]): MiddlewareHandler => {
     return async (c, next) => {
         const user = c.get("user");
         if (!user || user.role !== requiredRole)

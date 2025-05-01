@@ -89,12 +89,22 @@ export const UsersTable = ({
             async onConfirm() {
                 nprogress.start();
                 setLoading(true);
-                await deleteUserById("permanent", id);
-                nprogress.complete();
+                const res = await deleteUserById("permanent", id);
+                if (res.ok) {
+                    showNotification({
+                        message: "Kullanıcı Silindi",
+                        color: "green",
+                    });
+                    nprogress.complete();
+                    setLoading(false);
+                    refetchFunction();
+                    return;
+                }
                 showNotification({
-                    message: "Kullanıcı Silindi",
-                    color: "green",
+                    message: "Birşey ters gitti",
+                    color: "red",
                 });
+                nprogress.complete();
                 setLoading(false);
                 refetchFunction();
             },
@@ -228,13 +238,14 @@ export const UsersTable = ({
                             </Table.Td>
                         </Table.Tr>
                     ))}
-                    {users.length === 0 && (
-                        <Table.Tr>
-                            <Table.Td colSpan={999} c="dimmed" ta="center">
-                                Kullanıcı Bulunamadı
-                            </Table.Td>
-                        </Table.Tr>
-                    )}
+                    {!users ||
+                        (users.length === 0 && (
+                            <Table.Tr>
+                                <Table.Td colSpan={999} c="dimmed" ta="center">
+                                    Kullanıcı Bulunamadı
+                                </Table.Td>
+                            </Table.Tr>
+                        ))}
                 </Table.Tbody>
             </Table>
         </Table.ScrollContainer>

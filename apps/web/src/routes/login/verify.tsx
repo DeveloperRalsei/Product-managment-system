@@ -3,11 +3,7 @@ import { sendEmailVerificationCode, verifyEmailCode } from "@/utils/auth";
 import { Button, LoadingOverlay, PinInput, Stack, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { showNotification } from "@mantine/notifications";
-import {
-    createFileRoute,
-    useNavigate,
-    useRouterState,
-} from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
 export const Route = createFileRoute("/login/verify")({
@@ -22,12 +18,11 @@ export const Route = createFileRoute("/login/verify")({
         }
         await sendEmailVerificationCode(email);
     },
-    pendingComponent: () => "Yükleniyor",
+    pendingComponent: () => "Yükleniyor...",
 });
 
 function VerifyComponent() {
     const { redirect } = Route.useSearch();
-    const { isLoading: isRouterLoading } = useRouterState();
     const navigate = useNavigate();
     const form = useForm({
         initialValues: {
@@ -43,14 +38,24 @@ function VerifyComponent() {
         setLoading(true);
         const email = sessionStorage.getItem("pending_email");
         const res = await verifyEmailCode(email!, code);
-        if (!res.ok) {
+        if (res.status === 401) {
             showNotification({
-                message: "Birşey ters gitti... yine :/",
+                message: "Geçersiz bir kod girdiniz",
                 color: "red",
             });
+            setLoading(false);
+            return;
+        }
+        if (!res.ok) {
+            showNotification({
+                message: "Birşey ters gitti",
+                color: "red",
+            });
+            setLoading(false);
             return;
         }
 
+        setLoading(false);
         showNotification({
             message: "Giriş başarılı",
             color: "green",
@@ -64,7 +69,7 @@ function VerifyComponent() {
 
     return (
         <Stack h="100vh" align="center" justify="center">
-            <LoadingOverlay visible={loading || isRouterLoading} />
+            <LoadingOverlay visible={loading} />
             <Title order={2} ta="center">
                 Emaili Doğrula
             </Title>

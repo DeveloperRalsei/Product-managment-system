@@ -2,11 +2,11 @@ import { MiddlewareHandler } from "hono";
 import { verify, sign } from "hono/jwt";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { ZodError } from "zod";
-import { loginSchema, zodLoginSchema } from "#";
-import { validatePass } from "~/utils";
-import prisma from "~/service/prisma";
+import { loginSchema } from "#";
+import prisma from "~/lib/prisma";
 import { generateVerificationCode } from "~/utils/auth";
-import resend from "~/service/resend";
+import resend from "~/lib/resend";
+import authService from "~/service/auth.service";
 
 export const authUser: MiddlewareHandler = async (c) => {
     const sessionCookie = getCookie(c, "session-cookie");
@@ -23,8 +23,7 @@ export const authUser: MiddlewareHandler = async (c) => {
 };
 
 export const loginUser: MiddlewareHandler = async (c) => {
-    let body: loginSchema = await c.req.json();
-    const { email, password } = body;
+    let { email, password }: loginSchema = await c.req.json();
 
     if (!email || !password)
         return c.json(
@@ -36,38 +35,39 @@ export const loginUser: MiddlewareHandler = async (c) => {
         );
 
     try {
-        zodLoginSchema.parse({ email, password });
-
-        const user = await prisma.user.findUnique({
-            where: { email },
+        const [sessionCookie, user] = await authService.loginUser({
+            email,
+            password,
         });
-
-        if (!user) return c.json({ message: "Unauthorized" }, 401);
-        if (!validatePass(password, user.password))
-            return c.json({ message: "Unauthorized" }, 401);
-
-        const { password: _, ...rest } = user;
-
-        if (!user.verified) {
-            return c.json(
-                {
-                    message: "Email verification required",
-                },
-                403,
-            );
-        }
-
-        const sessionCookie = await sign(rest, process.env.JWT_TOKEN!);
-        setCookie(c, "session-cookie", sessionCookie, {
-            httpOnly: true,
-            maxAge: 60 * 60 * 6,
-            path: "/",
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-        });
+        setCookie(
+            c,
+            "session-cookie",
+            typeof sessionCookie === "string"
+                ? sessionCookie
+                : JSON.stringify(sessionCookie),
+            {
+                httpOnly: true,
+                maxAge: 60 * 60 * 6,
+                path: "/",
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "strict",
+            },
+        );
 
         return c.json(user);
     } catch (error) {
+        if (error instanceof Error) {
+            switch (error.message) {
+                case "404":
+                    return c.json({ message: "User not found" }, 404);
+                case "403":
+                    return c.json({ message: "Forbidden" }, 403);
+                case "401":
+                    return c.json({ message: "Unauthorized" }, 401);
+                default:
+                    return c.json({ error }, 400);
+            }
+        }
         if (error instanceof ZodError) {
             const { errors } = error;
 
@@ -109,7 +109,7 @@ export const verifyUser: MiddlewareHandler = async (c) => {
 
         if (!user.verified) {
             if (user.emailVerificationCode !== code) {
-                return c.json({ message: "Invalid verification code" }, 400);
+                return c.json({ message: "Invalid verification code" }, 401);
             }
 
             if (user.emailVerificationExpires! < new Date()) {
@@ -165,8 +165,11 @@ export const sendEmailVerification: MiddlewareHandler = async (c) => {
             },
         });
 
+        if (!process.env.RESEND_DOMAIN)
+            return c.json({ message: "RESEND_DOMAIN not defined" }, 400);
+
         const resendResponse = await resend.emails.send({
-            from: "noreply@devrals.xyz",
+            from: `noreply@${process.env.RESEND_DOMAIN}`,
             to: user.email,
             subject: "Hesap doğrulama",
             text: `Doğrulama kodun: ${code}`,

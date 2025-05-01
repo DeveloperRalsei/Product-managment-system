@@ -1,39 +1,20 @@
-import { User, Prisma } from "../../generated/prisma";
+import { User } from "~/../generated/prisma";
 import { MiddlewareHandler } from "hono";
-import prisma from "~/service/prisma";
-import { encryptPassword } from "~/utils";
-
-const defaultSelectValues = {
-    id: true,
-    name: true,
-    email: true,
-    verified: true,
-    role: true,
-    deleted: true,
-};
+import userService from "~/service/user.service";
 
 export const getAllUsers: MiddlewareHandler = async (c) => {
     const { q } = c.req.query();
-
     try {
-        const users = await prisma.user.findMany({
-            where: q
-                ? {
-                      OR: [
-                          { name: { contains: q, mode: "insensitive" } },
-                          { email: { contains: q, mode: "insensitive" } },
-                      ],
-                  }
-                : {},
-            select: defaultSelectValues,
-        });
+        const users = await userService.findAllUsers(q);
         return c.json(users);
     } catch (error) {
-        const message =
-            error instanceof Prisma.PrismaClientKnownRequestError
-                ? "Something went wrong while trying to get users"
-                : error;
-        return c.json({ message, error }, 500);
+        return c.json(
+            {
+                message: "Failed to fetch users",
+                error: error instanceof Error ? error.message : error,
+            },
+            500,
+        );
     }
 };
 
@@ -41,14 +22,8 @@ export const getUser: MiddlewareHandler = async (c) => {
     const emailOrId = c.req.param("email_or_id");
     if (!emailOrId) return c.json({ message: "Email or ID required" }, 400);
 
-    const isEmail = emailOrId.includes("@");
-    const identifier = isEmail ? { email: emailOrId } : { id: emailOrId };
-
     try {
-        const user = await prisma.user.findUnique({
-            where: identifier,
-            select: defaultSelectValues,
-        });
+        const user = await userService.findUser(emailOrId);
         if (!user) return c.json({ message: "User not found" }, 404);
         return c.json(user);
     } catch (error) {
@@ -57,83 +32,40 @@ export const getUser: MiddlewareHandler = async (c) => {
 };
 
 export const createUser: MiddlewareHandler = async (c) => {
-    const body = await c.req.json();
-    const { name, email, password, role }: Omit<User, "id" | "verified"> = body;
+    const { name, email, password, role, phoneNumber } = await c.req.json();
 
     if (!email || !password) {
-        return c.json(
-            {
-                message:
-                    "You did not provide all required parameters: name? email password",
-            },
-            400,
-        );
+        return c.json({ message: "Email and password are required" }, 400);
     }
 
     try {
-        const userFound = await prisma.user.findFirst({ where: { email } });
-
-        if (userFound && !userFound.deleted)
-            return c.json({ message: "Email already in use" }, 409);
-
-        const userData = {
+        const user = await userService.createUser({
             name,
             email,
-            password: encryptPassword(password),
+            password,
             role,
-        };
-        const newUser = await prisma.user.upsert({
-            create: userData,
-            update:
-                userFound && userFound.deleted
-                    ? { ...userData, deleted: false }
-                    : {},
-            where: { email },
-            select: defaultSelectValues,
+            phoneNumber,
         });
-
-        return c.json(
-            {
-                message: "User created",
-                user: newUser,
-            },
-            201,
-        );
+        return c.json({ message: "User created", user }, 201);
     } catch (error) {
-        const message =
-            error instanceof Prisma.PrismaClientKnownRequestError
-                ? error.message
-                : JSON.stringify(error);
-        return c.json({
-            message,
-            error,
-        });
+        const message = error instanceof Error ? error.message : error;
+        const status = message === "Email already in use" ? 409 : 500;
+        return c.json({ message }, status);
     }
 };
 
 export const deleteUser: MiddlewareHandler = async (c) => {
-    const param = c.req.param("email_or_id");
+    const emailOrId = c.req.param("email_or_id");
     const permanently = c.req.query("permanently");
 
-    if (!param) {
+    if (!emailOrId) {
         return c.json({ message: "Email or ID required" }, 400);
     }
 
-    const isEmail = param.includes("@");
-    const identifier = isEmail ? { email: param } : { id: param };
     const isPermanent = permanently === "1";
 
     try {
-        const user = isPermanent
-            ? await prisma.user.delete({
-                  where: identifier,
-                  select: defaultSelectValues,
-              })
-            : await prisma.user.update({
-                  where: identifier,
-                  data: { deleted: true },
-                  select: defaultSelectValues,
-              });
+        const user = await userService.deleteUser(emailOrId, isPermanent);
         return c.json({ message: "User deleted", user }, 202);
     } catch (error) {
         return c.json({ error }, 400);
@@ -141,31 +73,17 @@ export const deleteUser: MiddlewareHandler = async (c) => {
 };
 
 export const editUser: MiddlewareHandler = async (c) => {
-    const param = c.req.param("email_or_id");
-    if (!param) {
+    const emailOrId = c.req.param("email_or_id");
+    if (!emailOrId) {
         return c.json({ message: "Email or ID required" }, 400);
     }
 
-    const { name, email, password, phoneNumber, role, deleted } =
-        await c.req.json();
-    const identifier = param.includes("@") ? { email: param } : { id: param };
+    const userBody: User = await c.req.json();
 
     try {
-        const updatedUser = await prisma.user.update({
-            where: identifier,
-            data: {
-                name,
-                email,
-                password: password ? encryptPassword(password) : undefined,
-                phoneNumber,
-                role,
-                deleted,
-                verified: email ? false : undefined,
-            },
-            select: defaultSelectValues,
-        });
+        const user = userService.updateUser(emailOrId, { ...userBody });
 
-        return c.json({ message: "User updated", user: updatedUser });
+        return c.json({ message: "User updated", user });
     } catch (error) {
         return c.json({ error: "User not found or update failed" }, 400);
     }

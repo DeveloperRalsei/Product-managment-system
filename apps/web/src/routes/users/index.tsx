@@ -1,7 +1,9 @@
+import { User } from "#";
 import { useBreadCrumbs } from "@/components/ui/page/BreadCrumbs";
 import { UsersTable, UserTableLoading } from "@/components/ui/users/UsersTable";
 import { getUsers } from "@/utils/user";
 import { Divider, Stack, TextInput } from "@mantine/core";
+import { showNotification } from "@mantine/notifications";
 import { nprogress } from "@mantine/nprogress";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
@@ -13,21 +15,39 @@ export const Route = createFileRoute("/users/")({
 
 function RouteComponent() {
     const [search, setSearch] = useState("");
+
     const { change } = useBreadCrumbs();
     useEffect(() => {
         change([{ label: "Kullanıcılar", to: "/users" }]);
     }, []);
+
     const {
         isPending,
         data: users,
         refetch,
     } = useQuery({
         queryKey: ["users"],
-        queryFn: async () => {
+        queryFn: async (): Promise<User[]> => {
             nprogress.start();
-            const users = await getUsers();
+            const res = await getUsers();
+            if (res.status === 401) {
+                showNotification({
+                    message: "Buna yetkiniz yok",
+                    color: "red",
+                });
+                nprogress.complete();
+                return [];
+            }
+            if (!res.ok) {
+                showNotification({
+                    message: "Birşey ters gitti",
+                    color: "red",
+                });
+                nprogress.complete();
+                return [];
+            }
             nprogress.complete();
-            return users;
+            return await res.json();
         },
     });
 

@@ -3,6 +3,7 @@ export const REQUIRED_ENV_VARIABLES = [
     "JWT_TOKEN",
     "DATABASE_URL",
     "RESEND_KEY",
+    "RESEND_DOMAIN",
     "ALLOWED_ORIGINS",
 ];
 

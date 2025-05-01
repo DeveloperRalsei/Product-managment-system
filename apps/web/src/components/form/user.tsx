@@ -25,13 +25,23 @@ export type UserFormValues = MakeOptional<
     "name"
 >;
 
-const schema = z.object({
-    name: z.string().optional(),
-    email: z.string().email("Lütfen geçerli bir email adresi girin"),
-    password: z.string().min(6, "Şifre en az 6 karakter olmalı"),
-    passwordAgain: z.string(),
-    role: z.literal<User["role"]>("USER"),
-});
+const schema = z
+    .object({
+        name: z.string().optional(),
+        email: z.string().email("Lütfen geçerli bir email adresi girin"),
+        password: z.string().min(6, "Şifre en az 6 karakter olmalı"),
+        passwordAgain: z.string(),
+        role: z.string().default("USER"),
+    })
+    .superRefine((data, ctx) => {
+        if (data.password !== data.passwordAgain) {
+            ctx.addIssue({
+                path: ["passwordAgain"],
+                code: z.ZodIssueCode.custom,
+                message: "Şifreler eşleşmiyor",
+            });
+        }
+    });
 
 export const UserForm = ({
     onSubmit,
@@ -52,11 +62,7 @@ export const UserForm = ({
             passwordAgain: password,
             role,
         },
-        validate: {
-            passwordAgain: (v, { password }) =>
-                v !== password ? "Şifre ile aynı olmak zorunda!" : null,
-            ...zodResolver(schema),
-        },
+        validate: zodResolver(schema),
         onValuesChange: ({ role }) => {
             if (role === "ADMIN") setRoleWarning(true);
             else setRoleWarning(false);
@@ -64,7 +70,11 @@ export const UserForm = ({
     });
 
     return (
-        <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
+        <form
+            onSubmit={form.onSubmit(({ passwordAgain: _, ...rest }) =>
+                onSubmit(rest),
+            )}
+        >
             <Stack>
                 <SimpleGrid cols={{ md: 2, xs: 1 }}>
                     <TextInput
@@ -91,6 +101,7 @@ export const UserForm = ({
                     />
                     <Select
                         label="Rol"
+                        allowDeselect={false}
                         description={
                             roleWarning ? (
                                 <Text c="yellow">

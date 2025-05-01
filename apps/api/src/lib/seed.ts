@@ -6,10 +6,16 @@ async function main() {
         where: {
             email: "rizayildirim126@gmail.com",
         },
-        update: {},
+        update: {
+            email: "rizayildirim126@gmail.com",
+            password: encryptPassword("123123"),
+            name: "Rıza",
+            role: "ADMIN",
+            verified: true,
+        },
         create: {
             email: "rizayildirim126@gmail.com",
-            password: encryptPassword("123456"),
+            password: encryptPassword("123123"),
             name: "Rıza",
             role: "ADMIN",
             verified: true,

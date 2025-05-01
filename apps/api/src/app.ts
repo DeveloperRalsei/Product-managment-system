@@ -4,9 +4,13 @@ import { logger } from "hono/logger";
 import { v1Router } from "./routes";
 import { AuthUser } from "./types";
 import { serveStatic } from "@hono/node-server/serve-static";
+import { createNodeWebSocket } from "@hono/node-ws";
 
 type Variables = { user: AuthUser };
 const app = new Hono<{ Variables: Variables }>();
+
+const { injectWebSocket, upgradeWebSocket } = createNodeWebSocket({ app });
+export { injectWebSocket };
 
 app.use(
     cors({
@@ -21,5 +25,9 @@ app.use(
 );
 app.route("/api/v1", v1Router);
 app.get("/static/*", serveStatic({ root: "./" }));
+app.get(
+    "/ws",
+    upgradeWebSocket((c) => ({})),
+);
 
 export default app;

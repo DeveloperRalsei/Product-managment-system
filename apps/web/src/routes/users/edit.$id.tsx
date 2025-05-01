@@ -30,7 +30,8 @@ function RouteComponent() {
     }, []);
 
     const { mutate, isPending } = useMutation({
-        mutationFn: (values: UserFormValues) => updateUser(user.id, values),
+        mutationFn: ({ name, email, password, role }: UserFormValues) =>
+            updateUser(user.id, { name, email, password, role }),
         onSuccess: (response) => {
             if (response.status === 401)
                 return showNotification({
