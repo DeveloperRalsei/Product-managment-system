@@ -8,13 +8,14 @@ import { theme } from "./config/theme";
 import { Notifications } from "@mantine/notifications";
 import { ModalsProvider } from "@mantine/modals";
 import { NavigationProgress } from "@mantine/nprogress";
+import { BreadCrumbsProvider } from "./components/ui/page/BreadCrumbs";
 
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 import "@mantine/code-highlight/styles.css";
+import "@mantine/carousel/styles.css";
 import "@mantine/nprogress/styles.css";
 import "./styles.css";
-import { BreadCrumbsProvider } from "./components/ui/page/BreadCrumbs";
 
 const router = createRouter({ routeTree });
 

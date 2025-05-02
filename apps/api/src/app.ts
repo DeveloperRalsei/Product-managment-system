@@ -2,12 +2,10 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { v1Router } from "./routes";
-import { AuthUser } from "./types";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { createNodeWebSocket } from "@hono/node-ws";
 
-type Variables = { user: AuthUser };
-const app = new Hono<{ Variables: Variables }>();
+const app = new Hono();
 
 const { injectWebSocket, upgradeWebSocket } = createNodeWebSocket({ app });
 export { injectWebSocket };
