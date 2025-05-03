@@ -44,7 +44,6 @@ const schema = z
     });
 
 export const UserForm = ({
-    onSubmit,
     isPending,
     initialValues: { name, email, password, role },
 }: {
@@ -72,7 +71,7 @@ export const UserForm = ({
     return (
         <form
             onSubmit={form.onSubmit(({ passwordAgain: _, ...rest }) =>
-                onSubmit(rest),
+                console.log(rest),
             )}
         >
             <Stack>

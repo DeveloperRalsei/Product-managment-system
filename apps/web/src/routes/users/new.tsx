@@ -1,4 +1,4 @@
-import { UserForm, UserFormValues } from "@/components/form/user";
+import { UserForm, UserFormValues } from "@/components/ui/form/user";
 import { useBreadCrumbs } from "@/components/ui/page/BreadCrumbs";
 import { createUser } from "@/utils/user";
 import { Alert, Anchor, Divider, Stack } from "@mantine/core";

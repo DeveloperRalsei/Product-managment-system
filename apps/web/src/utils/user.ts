@@ -1,5 +1,5 @@
 import { MakeOptional, User } from "#";
-import { UserFormValues } from "@/components/form/user";
+import { UserFormValues } from "@/components/ui/form/user";
 
 export const createUser = async (
     values: MakeOptional<Omit<User, "id" | "verified" | "deleted">, "name">,

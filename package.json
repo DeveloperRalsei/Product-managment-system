@@ -6,7 +6,8 @@
         "client:build": "cd apps/web && pnpm build",
         "client:preview": "cd apps/web && pnpm preview",
         "server:dev": "cd apps/api && pnpm dev",
-        "dev": "concurrently \"pnpm run client:dev\" \"pnpm run server:dev\""
+        "dev": "concurrently \"pnpm run client:dev\" \"pnpm run server:dev\"",
+        "recreate-prisma": "rm -rf ./apps/api/generated && pnpx prisma generate --schema=./apps/api/prisma/schema.prisma"
     },
     "packageManager": "pnpm@10.9.0",
     "workspaces": [

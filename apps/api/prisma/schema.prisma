@@ -20,37 +20,48 @@ model User {
     emailVerificationExpires DateTime? @db.Date
     verified                 Boolean?  @default(false)
     deleted                  Boolean   @default(false)
-}
-
-enum Role {
-    USER
-    ADMIN
+    createdAt                DateTime  @default(now())
+    updatedAt                DateTime  @updatedAt
 }
 
 model Product {
-    id          String     @id @default(auto()) @map("_id") @db.ObjectId
-    name        String
-    description String?
-    price       Float
-    currency    Currency   @default(TRY)
-    inStock     Boolean    @default(true)
-    quantity    Int        @default(0)
-    images      String[]
-    categories  Category[] @relation(references: [id], fields: [categoryIDs])
-    categoryIDs String[]   @db.ObjectId
-    tags        String[]
-    createdAt   DateTime   @default(now())
-    updatedAt   DateTime   @updatedAt
+    id              String        @id @default(auto()) @map("_id") @db.ObjectId
+    name            String
+    description     String?
+    price           Float
+    currency        Currency      @default(TRY)
+    inStock         Boolean       @default(true)
+    isActive        Boolean       @default(true)
+    quantity        Int           @default(0)
+    images          String[]
+    category        InnerCategory @relation(fields: [innerCategoryId], references: [id])
+    tags            String[]
+    createdAt       DateTime      @default(now())
+    updatedAt       DateTime      @updatedAt
+    innerCategoryId String        @db.ObjectId
 }
 
 model Category {
+    id              String          @id @default(auto()) @map("_id") @db.ObjectId
+    name            String
+    innerCategories InnerCategory[]
+}
+
+model InnerCategory {
     id         String    @id @default(auto()) @map("_id") @db.ObjectId
-    productIDs String[]  @db.ObjectId
-    products   Product[] @relation(fields: [productIDs], references: [id])
+    name       String
+    products   Product[]
+    Category   Category? @relation(fields: [categoryId], references: [id])
+    categoryId String?   @db.ObjectId
 }
 
 enum Currency {
     USD
     TRY
     EUR
+}
+
+enum Role {
+    USER
+    ADMIN
 }

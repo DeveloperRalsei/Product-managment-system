@@ -4,6 +4,7 @@ import { logger } from "hono/logger";
 import { v1Router } from "./routes";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { createNodeWebSocket } from "@hono/node-ws";
+import { swaggerUI } from "@hono/swagger-ui";
 
 const app = new Hono();
 
@@ -23,6 +24,7 @@ app.use(
 );
 app.route("/api/v1", v1Router);
 app.get("/static/*", serveStatic({ root: "./" }));
+app.get("/ui", swaggerUI({ url: "/static" }));
 app.get(
     "/ws",
     upgradeWebSocket((c) => ({})),

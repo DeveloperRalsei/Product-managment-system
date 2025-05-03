@@ -9,6 +9,6 @@ COPY ./tsconfig*.json ./
 COPY ./apps/web ./apps/web
 COPY ./apps/shared ./apps/shared
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile && pnpm client:build
 
 CMD [ "pnpm", "client:preview" ]

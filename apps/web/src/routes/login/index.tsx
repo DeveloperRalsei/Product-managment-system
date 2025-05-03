@@ -54,7 +54,7 @@ function RouteComponent() {
         try {
             const { ok, status } = await login(v);
 
-            if (status === 401) {
+            if (status === 401 || status === 404) {
                 showNotification({
                     color: "red",
                     message: "Kullanıcı adı veya şifre yanlış",

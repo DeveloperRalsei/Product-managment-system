@@ -1,6 +1,9 @@
 import { User } from "#";
 import { useBreadCrumbs } from "@/components/ui/page/BreadCrumbs";
-import { UsersTable, UserTableLoading } from "@/components/ui/users/UsersTable";
+import {
+    UsersTable,
+    UserTableLoading,
+} from "@/components/ui/tables/users/UsersTable";
 import { getUsers } from "@/utils/user";
 import { Divider, Stack, TextInput } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";

@@ -1,17 +1,22 @@
-import { Context, MiddlewareHandler } from "hono";
+import { MiddlewareHandler } from "hono";
 import { mkdir, writeFile } from "fs/promises";
 import { join } from "path";
-import { MIMEType } from "util";
 
-type Variables = {
-    uploadedFiles: string[];
-};
-
-const allowedTypes = ["image/png", "image/jpeg", "image/gif"];
+const allowedTypes = [
+    "application/json",
+    "audio/mpeg",
+    "application/pdf",
+    "image/svg+xml",
+    "text/plain",
+    "video/mp4",
+    "image/png",
+    "image/jpeg",
+    "image/gif",
+];
 
 export const upload =
     (storePath: string, formDataName: string): MiddlewareHandler =>
-    async (c: Context<{ Variables: Variables }>, next) => {
+    async (c, next) => {
         const body = await c.req.parseBody({ all: true });
         const files = Array.isArray(body[formDataName])
             ? body[formDataName]
@@ -21,21 +26,22 @@ export const upload =
         if (!storePath.startsWith(process.cwd()))
             storePath = join(process.cwd(), "static", storePath);
 
-        await mkdir(storePath, { recursive: true });
+        await mkdir(storePath, { recursive: true }).catch(console.log);
 
         for (let f of files) {
             if (!(f instanceof File)) continue;
 
-            if (allowedTypes.includes(f.type)) continue;
+            if (!allowedTypes.includes(f.type)) {
+                console.log("Unallowed file type: ", f.type);
+            }
 
             const fileName = `${Date.now()}-${f.name}`;
 
             const filePath = join(storePath, fileName);
-            console.log(filePath);
 
             const buffer = Buffer.from(await f.arrayBuffer());
 
-            await writeFile(filePath, buffer);
+            await writeFile(filePath, buffer).catch(console.log);
 
             const fileUrl = filePath;
             savedFiles.push(fileUrl);

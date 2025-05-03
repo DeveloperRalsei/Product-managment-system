@@ -48,6 +48,8 @@ const createUser = async ({
     | "emailVerificationCode"
     | "deleted"
     | "verified"
+    | "createdAt"
+    | "updatedAt"
 >) => {
     const userFound = await prisma.user.findFirst({ where: { email } });
 
