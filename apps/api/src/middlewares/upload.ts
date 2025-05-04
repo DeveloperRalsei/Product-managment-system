@@ -1,18 +1,7 @@
 import { MiddlewareHandler } from "hono";
 import { mkdir, writeFile } from "fs/promises";
 import { join } from "path";
-
-const allowedTypes = [
-    "application/json",
-    "audio/mpeg",
-    "application/pdf",
-    "image/svg+xml",
-    "text/plain",
-    "video/mp4",
-    "image/png",
-    "image/jpeg",
-    "image/gif",
-];
+import { ACCEPTED_FILE_TYPES } from "#";
 
 export const upload =
     (storePath: string, formDataName: string): MiddlewareHandler =>
@@ -31,7 +20,7 @@ export const upload =
         for (let f of files) {
             if (!(f instanceof File)) continue;
 
-            if (!allowedTypes.includes(f.type)) {
+            if (!ACCEPTED_FILE_TYPES.includes(f.type)) {
                 console.log("Unallowed file type: ", f.type);
             }
 

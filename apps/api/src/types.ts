@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { User } from "../generated/prisma";
+import { User } from "#/prisma";
 import { productSchema } from "#";
 
 export type AuthUser = {

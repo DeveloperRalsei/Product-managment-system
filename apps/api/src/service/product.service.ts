@@ -27,7 +27,7 @@ const getAll = async (q?: string) =>
         select: defaultSelectValues,
     });
 
-const create = async (p: ProductInput) =>
+const create = async ({ images: _, ...p }: ProductInput) =>
     await prisma.product.create({
         data: p,
         select: defaultSelectValues,

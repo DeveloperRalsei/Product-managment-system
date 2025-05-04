@@ -46,6 +46,7 @@ const schema = z
 export const UserForm = ({
     isPending,
     initialValues: { name, email, password, role },
+    onSubmit,
 }: {
     onSubmit: (params: UserFormValues) => void;
     isPending: boolean;
@@ -58,7 +59,7 @@ export const UserForm = ({
             name,
             email,
             password,
-            passwordAgain: password,
+            passwordAgain: "",
             role,
         },
         validate: zodResolver(schema),
@@ -71,7 +72,7 @@ export const UserForm = ({
     return (
         <form
             onSubmit={form.onSubmit(({ passwordAgain: _, ...rest }) =>
-                console.log(rest),
+                onSubmit(rest),
             )}
         >
             <Stack>

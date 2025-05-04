@@ -1,4 +1,4 @@
-import { User } from "~/../generated/prisma";
+import { User } from "#/prisma";
 import { MiddlewareHandler } from "hono";
 import userService from "~/service/user.service";
 

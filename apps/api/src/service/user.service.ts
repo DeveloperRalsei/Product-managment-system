@@ -1,4 +1,4 @@
-import { User } from "~/../generated/prisma";
+import { User } from "#/prisma";
 import prisma from "~/lib/prisma";
 import { encryptPassword } from "~/utils";
 

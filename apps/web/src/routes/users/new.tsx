@@ -1,4 +1,4 @@
-import { UserForm, UserFormValues } from "@/components/ui/form/user";
+import { UserFormValues } from "@/components/ui/form/user";
 import { useBreadCrumbs } from "@/components/ui/page/BreadCrumbs";
 import { createUser } from "@/utils/user";
 import { Alert, Anchor, Divider, Stack } from "@mantine/core";
@@ -6,7 +6,13 @@ import { showNotification } from "@mantine/notifications";
 import { IconExclamationCircle } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
+
+const UserForm = lazy(() =>
+    import("@/components/ui/form/user").then((mod) => ({
+        default: mod.UserForm,
+    })),
+);
 
 export const Route = createFileRoute("/users/new")({
     component: RouteComponent,
@@ -79,16 +85,18 @@ function RouteComponent() {
                     </Anchor>{" "}
                     ekranından silebilirsiniz.
                 </Alert>
-                <UserForm
-                    initialValues={{
-                        name: "",
-                        email: "",
-                        password: "",
-                        role: "USER",
-                    }}
-                    isPending={isPending}
-                    onSubmit={mutate}
-                />
+                <Suspense fallback="Yükleniyor...">
+                    <UserForm
+                        initialValues={{
+                            name: "",
+                            email: "",
+                            password: "",
+                            role: "USER",
+                        }}
+                        isPending={isPending}
+                        onSubmit={mutate}
+                    />
+                </Suspense>
             </Stack>
         </>
     );

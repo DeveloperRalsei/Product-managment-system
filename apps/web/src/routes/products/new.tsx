@@ -1,10 +1,13 @@
-import { Product } from "#";
-import { ProductForm } from "@/components/ui/form/product";
 import { useBreadCrumbs } from "@/components/ui/page/BreadCrumbs";
-import { FileInput, SimpleGrid, Stack } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import { Stack } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
-import { FormEvent, useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
+
+const ProductForm = lazy(() =>
+    import("@/components/ui/form/product").then((mod) => ({
+        default: mod.ProductForm,
+    })),
+);
 
 export const Route = createFileRoute("/products/new")({
     component: RouteComponent,
@@ -19,28 +22,26 @@ function RouteComponent() {
         ]);
     }, []);
 
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-    };
-
     return (
         <Stack m="md">
-            <ProductForm
-                initialValues={{
-                    name: "",
-                    description: "",
-                    currency: "TRY",
-                    images: [],
-                    inStock: true,
-                    innerCategoryId: "",
-                    isActive: true,
-                    price: 0,
-                    quantity: 0,
-                    tags: [],
-                }}
-                isPending={false}
-                onSubmit={console.log}
-            />
+            <Suspense fallback="Yükleniyor...">
+                <ProductForm
+                    initialValues={{
+                        name: "",
+                        description: "",
+                        currency: "TRY",
+                        images: [],
+                        inStock: true,
+                        innerCategoryId: "",
+                        isActive: true,
+                        price: 0,
+                        quantity: 0,
+                        tags: [],
+                    }}
+                    isPending={false}
+                    onSubmit={console.log}
+                />
+            </Suspense>
         </Stack>
     );
 }

@@ -1,4 +1,4 @@
-import { User } from "../../generated/prisma";
+import { User } from "#/prisma";
 import type { MiddlewareHandler } from "hono";
 import { getCookie } from "hono/cookie";
 import { validateToken } from "~/utils/token";

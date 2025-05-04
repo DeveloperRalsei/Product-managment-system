@@ -1,9 +1,8 @@
 import { serve } from "@hono/node-server";
 import { validateEnv } from "./utils";
-import { config } from "dotenv";
+import "dotenv/config";
 import app, { injectWebSocket } from "./app";
 
-config({ path: "../.env" });
 const missingEnvVariables = validateEnv();
 
 if (missingEnvVariables)

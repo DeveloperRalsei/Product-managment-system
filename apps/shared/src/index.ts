@@ -54,3 +54,17 @@ export type InnerCategory = {
     category: Category;
     categoryId: String;
 };
+
+export const MAX_UPLOAD_SIZE = 1024 * 1024 * 50, // 50m MB
+    ACCEPTED_FILE_TYPES = [
+        "application/json",
+        "audio/mpeg",
+        "application/pdf",
+        "image/svg+xml",
+        "text/plain",
+        "video/mp4",
+        "image/png",
+        "image/jpeg",
+        "image/gif",
+        "image/webp",
+    ];

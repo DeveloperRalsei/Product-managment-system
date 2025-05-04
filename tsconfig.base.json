@@ -13,6 +13,7 @@
         "baseUrl": ".",
         "paths": {
             "#": ["./apps/shared/src/index.ts"],
+            "#/prisma": ["./apps/shared/src/prisma"],
             "@/*": ["./apps/web/src/*"],
             "~/*": ["./apps/api/src/*"]
         },

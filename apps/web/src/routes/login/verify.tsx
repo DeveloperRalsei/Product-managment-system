@@ -1,6 +1,13 @@
 import { wait } from "#";
 import { sendEmailVerificationCode, verifyEmailCode } from "@/utils/auth";
-import { Button, LoadingOverlay, PinInput, Stack, Title } from "@mantine/core";
+import {
+    Button,
+    LoadingOverlay,
+    PinInput,
+    Stack,
+    Text,
+    Title,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { showNotification } from "@mantine/notifications";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -18,7 +25,7 @@ export const Route = createFileRoute("/login/verify")({
         }
         await sendEmailVerificationCode(email);
     },
-    pendingComponent: () => "Yükleniyor...",
+    pendingComponent: () => <LoadingOverlay visible />,
 });
 
 function VerifyComponent() {
@@ -73,6 +80,7 @@ function VerifyComponent() {
             <Title order={2} ta="center">
                 Emaili Doğrula
             </Title>
+            <Text span>E-Mail posta kutunu kontrol et</Text>
             <form onSubmit={form.onSubmit(handleSubmit)}>
                 <PinInput length={6} {...form.getInputProps("code")} />
                 <Button type="submit" loading={loading} mt="sm" fullWidth>

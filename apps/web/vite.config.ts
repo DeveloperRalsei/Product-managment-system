@@ -22,6 +22,12 @@ export default defineConfig(({ mode }) => {
                             : env.VITE_API_URL,
                     changeOrigin: true,
                 },
+                "/static": {
+                    target:
+                        mode === "development"
+                            ? "http://localhost:3000/"
+                            : env.VITE_API_URL,
+                },
             },
         },
         build: {

@@ -2,12 +2,15 @@ import { Product, productSchema } from "#";
 import {
     Button,
     Divider,
+    FileInput,
     Group,
+    Image,
     NumberInput,
     Select,
     SimpleGrid,
     Stack,
-    Textarea,
+    Tabs,
+    TagsInput,
     TextInput,
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
@@ -16,17 +19,22 @@ import {
     IconCurrencyEuro,
     IconCurrencyLira,
 } from "@tabler/icons-react";
+import { Carousel } from "@mantine/carousel";
+import { memo, useEffect, useMemo } from "react";
+import { Editor } from "./text-editor";
 
 export type ProductFormValues = Omit<
     Product,
-    "id" | "category" | "createdAt" | "updatedAt"
->;
+    "id" | "category" | "createdAt" | "updatedAt" | "images"
+> & { images: File[] };
 
 const currencyValues: Record<Product["currency"], React.ReactNode> = {
     TRY: <IconCurrencyLira />,
     EUR: <IconCurrencyEuro />,
     USD: <IconCurrencyDollar />,
 };
+
+const MemoizedEditor = memo(Editor);
 
 export const ProductForm = ({
     initialValues,
@@ -41,22 +49,35 @@ export const ProductForm = ({
         mode: "controlled",
         initialValues,
         validate: zodResolver(productSchema),
+        validateInputOnChange: true,
     });
 
+    const imgURLs = useMemo(
+        () => form.values.images.map((img) => URL.createObjectURL(img)),
+        [form.values.images],
+    );
+    useEffect(() => {
+        return () => {
+            imgURLs.forEach((url) => URL.revokeObjectURL(url));
+        };
+    }, [imgURLs]);
+
     return (
-        <form onSubmit={form.onSubmit(onSubmit)}>
+        <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
             <Stack>
                 <SimpleGrid cols={{ md: 2, sm: 1 }}>
                     <Stack>
                         <Divider label="İsimlendirme" />
                         <TextInput
                             label="Ürün Adı"
-                            required
+                            withAsterisk
                             {...form.getInputProps("name")}
                         />
-                        <Textarea
-                            label="Açıklama"
-                            {...form.getInputProps("description")}
+                        <NumberInput
+                            label="Miktar"
+                            min={0}
+                            withAsterisk
+                            {...form.getInputProps("quantity")}
                         />
                     </Stack>
                     <Stack>
@@ -71,14 +92,67 @@ export const ProductForm = ({
                             {...form.getInputProps("price")}
                         />
                         <Select
-                            required
                             label="Değer"
-                            clearable={false}
                             leftSection={currencyValues[form.values.currency]}
-                            data={["TRY", "USD", "EUR"]}
+                            withAsterisk
+                            data={[
+                                {
+                                    label: "Türk Lirası",
+                                    value: "TRY",
+                                },
+                                {
+                                    label: "Avrupa Eurosu",
+                                    value: "EUR",
+                                },
+                                {
+                                    label: "Amerikan Doları",
+                                    value: "USD",
+                                },
+                            ]}
+                            allowDeselect={false}
                             {...form.getInputProps("currency")}
                         />
                     </Stack>
+                </SimpleGrid>
+                <Divider label="Açıklama" />
+                <MemoizedEditor
+                    onChange={(content) =>
+                        form.setFieldValue("description", content)
+                    }
+                />
+                <Divider label="Kategori ve Resimler" />
+                <Tabs></Tabs>
+                <TagsInput
+                    label="Etiketler"
+                    value={form.values.tags}
+                    onChange={(v) => form.setFieldValue("tags", v)}
+                />
+                <SimpleGrid cols={{ md: 2, sm: 1 }}>
+                    <Stack>
+                        <FileInput
+                            accept="image/png,image/jpeg,image/gif"
+                            label="Resimler"
+                            description="Sadece (jpg,png,gif) tipinde dosyalar kabul edilir"
+                            clearable
+                            multiple
+                            {...form.getInputProps("images")}
+                        />
+                    </Stack>
+                    {form.values.images.length > 0 && (
+                        <Carousel>
+                            {imgURLs.map((url, i) => (
+                                <Carousel.Slide key={url + i}>
+                                    <Image
+                                        src={url}
+                                        alt={i.toString()}
+                                        key={i}
+                                        radius="sm"
+                                        mah={300}
+                                    />
+                                </Carousel.Slide>
+                            ))}
+                        </Carousel>
+                    )}
                 </SimpleGrid>
             </Stack>
             <Group mt="sm">

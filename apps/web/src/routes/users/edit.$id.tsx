@@ -1,4 +1,4 @@
-import { UserForm, UserFormValues } from "@/components/ui/form/user";
+import { UserFormValues } from "@/components/ui/form/user";
 import { useBreadCrumbs } from "@/components/ui/page/BreadCrumbs";
 import { getUserById, updateUser } from "@/utils/user";
 import { Alert, Divider, Stack, Title } from "@mantine/core";
@@ -6,7 +6,13 @@ import { showNotification } from "@mantine/notifications";
 import { IconExclamationCircle } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
+
+const UserForm = lazy(() =>
+    import("@/components/ui/form/user").then((mod) => ({
+        default: mod.UserForm,
+    })),
+);
 
 export const Route = createFileRoute("/users/edit/$id")({
     component: RouteComponent,
@@ -69,11 +75,13 @@ function RouteComponent() {
                 onaylanması gerekmektedir.
             </Alert>
             <Divider />
-            <UserForm
-                initialValues={user}
-                onSubmit={mutate}
-                isPending={isPending}
-            />
+            <Suspense fallback="yükleniyor...">
+                <UserForm
+                    initialValues={user}
+                    onSubmit={mutate}
+                    isPending={isPending}
+                />
+            </Suspense>
         </Stack>
     );
 }

@@ -7,6 +7,7 @@ import { productSchema } from "#";
 import { zValidator } from "@hono/zod-validator";
 import { withAuth, withRole } from "~/middlewares/auth";
 import { ProductInput } from "~/types";
+import { upload } from "~/middlewares/upload";
 
 const router = new Hono();
 
@@ -15,9 +16,10 @@ router.post(
     "/new",
     withAuth,
     withRole("ADMIN"),
-    zValidator("json", productSchema),
+    zValidator("form", productSchema),
+    upload("images/product", "images"),
     async (c) => {
-        const body: ProductInput = c.req.valid("json");
+        const body: ProductInput = c.req.valid("form");
         return await createProduct(c, body);
     },
 );
