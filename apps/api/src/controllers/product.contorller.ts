@@ -20,7 +20,7 @@ export const getAllProducts: MiddlewareHandler = async (c) => {
 
 export const createProduct = async (c: Context, body: ProductInput) => {
     try {
-        const product = await productService.create(body);
+        const product = await productService.create(body, c);
         return c.json({ message: "Product Created", product }, 201);
     } catch (error) {
         return c.json({ error }, 400);

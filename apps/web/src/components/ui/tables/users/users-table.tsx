@@ -15,7 +15,7 @@ import {
     IconX,
 } from "@tabler/icons-react";
 import { openConfirmModal, openModal } from "@mantine/modals";
-import { activateUser, deleteUserById } from "@/utils/user";
+import { activateUser, deleteUserById } from "@/utils/api/user";
 import { nprogress } from "@mantine/nprogress";
 import { showNotification } from "@mantine/notifications";
 import { Link } from "@tanstack/react-router";

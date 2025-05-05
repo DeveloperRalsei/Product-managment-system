@@ -6,7 +6,7 @@ import {
     useLocation,
 } from "@tanstack/react-router";
 import { Layout, NotFoundComponent } from "../components";
-import { isAuthenticated } from "@/utils/auth";
+import { isAuthenticated } from "@/utils/api/auth";
 import { ErrorComponent } from "@/components/ui/page/ErrorComponent";
 import { BreadCrumbs } from "@/components/ui/page/BreadCrumbs";
 

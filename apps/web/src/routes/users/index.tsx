@@ -3,8 +3,8 @@ import { useBreadCrumbs } from "@/components/ui/page/BreadCrumbs";
 import {
     UsersTable,
     UserTableLoading,
-} from "@/components/ui/tables/users/UsersTable";
-import { getUsers } from "@/utils/user";
+} from "@/components/ui/tables/users/users-table";
+import { getUsers } from "@/utils/api/user";
 import { Divider, Stack, TextInput } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import { nprogress } from "@mantine/nprogress";

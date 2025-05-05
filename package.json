@@ -7,14 +7,16 @@
         "client:preview": "cd apps/web && pnpm preview",
         "server:dev": "cd apps/api && pnpm dev",
         "dev": "concurrently \"pnpm run client:dev\" \"pnpm run server:dev\"",
-        "recreate-prisma": "rm -rf ./apps/api/generated && pnpx prisma generate --schema=./apps/api/prisma/schema.prisma"
+        "recreate-prisma": "rm -rf ./apps/shared/src/primsa && pnpx prisma generate --schema=./apps/api/prisma/schema.prisma"
     },
     "packageManager": "pnpm@10.9.0",
     "workspaces": [
         "apps/*"
     ],
     "dependencies": {
+        "@mantine/charts": "^7.17.7",
         "concurrently": "^9.1.2",
+        "recharts": "^2.15.3",
         "typescript": "^5.8.3",
         "zod": "^3.24.3"
     },

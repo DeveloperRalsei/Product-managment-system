@@ -1,6 +1,6 @@
 import { UserFormValues } from "@/components/ui/form/user";
 import { useBreadCrumbs } from "@/components/ui/page/BreadCrumbs";
-import { getUserById, updateUser } from "@/utils/user";
+import { getUserById, updateUser } from "@/utils/api/user";
 import { Alert, Divider, Stack, Title } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import { IconExclamationCircle } from "@tabler/icons-react";

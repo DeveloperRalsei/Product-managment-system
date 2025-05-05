@@ -14,26 +14,43 @@ export const productSchema = z.object({
         .string()
         .max(400, "Açıklama en fazla 400 karakter olabilir")
         .optional(),
-    price: z.number().nonnegative("Zarar etmek istiyorsun herhalde :)"),
+    price: z.coerce.number().nonnegative("Zarar etmek istiyorsun herhalde :)"),
     currency: currencyEnum.default("TRY"),
-    inStock: z.boolean().default(true),
-    isActive: z.boolean().default(true),
-    quantity: z
+    inStock: z.coerce.boolean().default(true),
+    isActive: z.coerce.boolean().default(true),
+    quantity: z.coerce
         .number()
         .int("Geçersiz değer")
         .nonnegative("En az 0 olmalı")
         .default(0),
-    images: z.array(
-        z.instanceof(File).refine((file) => {
-            if (file.size > MAX_UPLOAD_SIZE)
-                return "Dosya fazla büyük (max 50MB)";
-            if (!ACCEPTED_FILE_TYPES.includes(file.type))
-                return "Geçersiz Dosya türü";
-            return file;
+    images: z
+        .union([z.instanceof(File), z.array(z.instanceof(File))])
+        .transform((val) => (Array.isArray(val) ? val : [val]))
+        .optional()
+        .superRefine((files, ctx) => {
+            if (!files) return;
+            files.forEach((file, index) => {
+                if (file.size > MAX_UPLOAD_SIZE) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: "Dosya fazla büyük (max 50MB)",
+                        path: [index],
+                    });
+                }
+                if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: "Geçersiz dosya türü",
+                        path: [index],
+                    });
+                }
+            });
         }),
-    ),
-    tags: z.array(z.string()).default([]),
-    createdAt: z.date().optional(),
-    updatedAt: z.date().optional(),
+    tags: z
+        .union([z.array(z.string()), z.string()])
+        .transform((val) => (Array.isArray(val) ? val : [val]))
+        .default([]),
+    createdAt: z.coerce.date().optional(),
+    updatedAt: z.coerce.date().optional(),
     innerCategoryId: z.string(),
 });

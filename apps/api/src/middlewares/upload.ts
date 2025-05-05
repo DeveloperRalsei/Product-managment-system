@@ -1,7 +1,7 @@
 import { MiddlewareHandler } from "hono";
 import { mkdir, writeFile } from "fs/promises";
-import { join } from "path";
 import { ACCEPTED_FILE_TYPES } from "#";
+import path from "path";
 
 export const upload =
     (storePath: string, formDataName: string): MiddlewareHandler =>
@@ -12,31 +12,24 @@ export const upload =
             : [body[formDataName]];
 
         const savedFiles: string[] = [];
-        if (!storePath.startsWith(process.cwd()))
-            storePath = join(process.cwd(), "static", storePath);
 
-        await mkdir(storePath, { recursive: true }).catch(console.log);
+        await mkdir(path.join("static", storePath), { recursive: true });
 
-        for (let f of files) {
-            if (!(f instanceof File)) continue;
+        for (const file of files) {
+            if (!(file instanceof File)) continue;
+            if (!ACCEPTED_FILE_TYPES.includes(file.type)) continue;
 
-            if (!ACCEPTED_FILE_TYPES.includes(f.type)) {
-                console.log("Unallowed file type: ", f.type);
-            }
+            const fileName = `${Date.now()}-${file.name}`;
 
-            const fileName = `${Date.now()}-${f.name}`;
+            const fileSavePath = path.join("static", storePath, fileName);
+            const buffer = Buffer.from(await file.arrayBuffer());
 
-            const filePath = join(storePath, fileName);
+            await writeFile(fileSavePath, buffer).catch(console.error);
 
-            const buffer = Buffer.from(await f.arrayBuffer());
-
-            await writeFile(filePath, buffer).catch(console.log);
-
-            const fileUrl = filePath;
-            savedFiles.push(fileUrl);
+            const publicUrl = `/static/${storePath}/${fileName}`;
+            savedFiles.push(publicUrl);
         }
 
         c.set("uploadedFiles", savedFiles);
-
         await next();
     };

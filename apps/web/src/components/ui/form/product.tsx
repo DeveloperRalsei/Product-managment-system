@@ -13,7 +13,7 @@ import {
     TagsInput,
     TextInput,
 } from "@mantine/core";
-import { useForm, zodResolver } from "@mantine/form";
+import { useForm, UseFormReturnType, zodResolver } from "@mantine/form";
 import {
     IconCurrencyDollar,
     IconCurrencyEuro,
@@ -43,7 +43,13 @@ export const ProductForm = ({
 }: {
     initialValues: ProductFormValues;
     isPending: boolean;
-    onSubmit: (values: ProductFormValues) => void;
+    onSubmit: (
+        values: ProductFormValues,
+        form: UseFormReturnType<
+            ProductFormValues,
+            (values: ProductFormValues) => ProductFormValues
+        >,
+    ) => void;
 }) => {
     const form = useForm<ProductFormValues>({
         mode: "controlled",
@@ -63,7 +69,7 @@ export const ProductForm = ({
     }, [imgURLs]);
 
     return (
-        <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
+        <form onSubmit={form.onSubmit((v) => onSubmit(v, form))}>
             <Stack>
                 <SimpleGrid cols={{ md: 2, sm: 1 }}>
                     <Stack>
@@ -121,7 +127,15 @@ export const ProductForm = ({
                     }
                 />
                 <Divider label="Kategori ve Resimler" />
-                <Tabs></Tabs>
+                <Tabs mb="md">
+                    <Tabs.List>
+                        <Tabs.Tab value="1">Test Categori</Tabs.Tab>
+                        <Tabs.Tab value="2">Test Categori</Tabs.Tab>
+                    </Tabs.List>
+                    <TextInput label="Ara..." />
+                    <Tabs.Panel value="1">Tab 1</Tabs.Panel>
+                    <Tabs.Panel value="2">Tab 2</Tabs.Panel>
+                </Tabs>
                 <TagsInput
                     label="Etiketler"
                     value={form.values.tags}

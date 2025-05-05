@@ -16,6 +16,7 @@ import "@mantine/code-highlight/styles.css";
 import "@mantine/carousel/styles.css";
 import "@mantine/nprogress/styles.css";
 import "@mantine/tiptap/styles.css";
+import "@mantine/charts/styles.css";
 import "./styles.css";
 
 const router = createRouter({ routeTree });

@@ -1,5 +1,5 @@
 import { wait, zodLoginSchema } from "#";
-import { isAuthenticated, login } from "@/utils/auth";
+import { isAuthenticated, login } from "@/utils/api/auth";
 import {
     Button,
     Paper,

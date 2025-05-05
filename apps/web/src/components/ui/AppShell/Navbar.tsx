@@ -10,7 +10,7 @@ import {
 } from "@mantine/core";
 import { links } from "apps/web/src/data/routing";
 import { useNavigate } from "@tanstack/react-router";
-import { logout, useUser } from "@/utils/auth";
+import { logout, useUser } from "@/utils/api/auth";
 import { IconLogout } from "@tabler/icons-react";
 import { openConfirmModal } from "@mantine/modals";
 import { useState } from "react";

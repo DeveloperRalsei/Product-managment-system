@@ -1,5 +1,5 @@
 import { wait } from "#";
-import { sendEmailVerificationCode, verifyEmailCode } from "@/utils/auth";
+import { sendEmailVerificationCode, verifyEmailCode } from "@/utils/api/auth";
 import {
     Button,
     LoadingOverlay,

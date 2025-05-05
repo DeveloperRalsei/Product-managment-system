@@ -1,6 +1,6 @@
 import { Stack } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
-import { useMarkdown } from "../utils/hooks/useMarkdown";
+import { useMarkdown } from "@/utils/hooks/useMarkdown";
 import { useBreadCrumbs } from "@/components/ui/page/BreadCrumbs";
 import { useEffect } from "react";
 

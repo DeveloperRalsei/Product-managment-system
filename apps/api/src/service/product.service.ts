@@ -1,11 +1,16 @@
+import { Prisma } from "#/prisma";
+import { Context } from "hono";
 import prisma from "~/lib/prisma";
 import { ProductInput } from "~/types";
 
-const defaultSelectValues = {
+const defaultSelectValues: Prisma.ProductSelect = {
     id: true,
     name: true,
     description: true,
-    categories: true,
+    innerCategoryId: true,
+    isActive: true,
+    updatedAt: true,
+    createdAt: true,
     tags: true,
     price: true,
     currency: true,
@@ -27,10 +32,26 @@ const getAll = async (q?: string) =>
         select: defaultSelectValues,
     });
 
-const create = async ({ images: _, ...p }: ProductInput) =>
-    await prisma.product.create({
-        data: p,
-        select: defaultSelectValues,
+const create = async ({ images, ...p }: ProductInput, c: Context) => {
+    const imgList: string[] = c.get("uploadedFiles");
+
+    imgList.forEach((img) => {
+        if (img.startsWith(process.cwd())) img = img.replace(process.cwd(), "");
     });
 
+    const { id } = (await prisma.innerCategory.findMany())[0];
+
+    const data = {
+        ...p,
+        images: imgList,
+        innerCategoryId: id,
+    };
+
+    console.log(data);
+
+    return await prisma.product.create({
+        data,
+        select: defaultSelectValues,
+    });
+};
 export default { getAll, create };
