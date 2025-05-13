@@ -16,10 +16,13 @@ import { Route as IndexImport } from './routes/index'
 import { Route as UsersIndexImport } from './routes/users/index'
 import { Route as ProductsIndexImport } from './routes/products/index'
 import { Route as LoginIndexImport } from './routes/login/index'
+import { Route as CategoriesIndexImport } from './routes/categories/index'
 import { Route as UsersNewImport } from './routes/users/new'
 import { Route as ProductsNewImport } from './routes/products/new'
 import { Route as LoginVerifyImport } from './routes/login/verify'
+import { Route as CategoriesNewImport } from './routes/categories/new'
 import { Route as UsersEditIdImport } from './routes/users/edit.$id'
+import { Route as ProductsEditIdImport } from './routes/products/edit.$id'
 
 // Create/Update Routes
 
@@ -53,6 +56,12 @@ const LoginIndexRoute = LoginIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const CategoriesIndexRoute = CategoriesIndexImport.update({
+  id: '/categories/',
+  path: '/categories/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const UsersNewRoute = UsersNewImport.update({
   id: '/users/new',
   path: '/users/new',
@@ -71,9 +80,21 @@ const LoginVerifyRoute = LoginVerifyImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const CategoriesNewRoute = CategoriesNewImport.update({
+  id: '/categories/new',
+  path: '/categories/new',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const UsersEditIdRoute = UsersEditIdImport.update({
   id: '/users/edit/$id',
   path: '/users/edit/$id',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ProductsEditIdRoute = ProductsEditIdImport.update({
+  id: '/products/edit/$id',
+  path: '/products/edit/$id',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -93,6 +114,13 @@ declare module '@tanstack/react-router' {
       path: '/wsTest'
       fullPath: '/wsTest'
       preLoaderRoute: typeof WsTestImport
+      parentRoute: typeof rootRoute
+    }
+    '/categories/new': {
+      id: '/categories/new'
+      path: '/categories/new'
+      fullPath: '/categories/new'
+      preLoaderRoute: typeof CategoriesNewImport
       parentRoute: typeof rootRoute
     }
     '/login/verify': {
@@ -116,6 +144,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UsersNewImport
       parentRoute: typeof rootRoute
     }
+    '/categories/': {
+      id: '/categories/'
+      path: '/categories'
+      fullPath: '/categories'
+      preLoaderRoute: typeof CategoriesIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/login/': {
       id: '/login/'
       path: '/login'
@@ -137,6 +172,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UsersIndexImport
       parentRoute: typeof rootRoute
     }
+    '/products/edit/$id': {
+      id: '/products/edit/$id'
+      path: '/products/edit/$id'
+      fullPath: '/products/edit/$id'
+      preLoaderRoute: typeof ProductsEditIdImport
+      parentRoute: typeof rootRoute
+    }
     '/users/edit/$id': {
       id: '/users/edit/$id'
       path: '/users/edit/$id'
@@ -152,24 +194,30 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/wsTest': typeof WsTestRoute
+  '/categories/new': typeof CategoriesNewRoute
   '/login/verify': typeof LoginVerifyRoute
   '/products/new': typeof ProductsNewRoute
   '/users/new': typeof UsersNewRoute
+  '/categories': typeof CategoriesIndexRoute
   '/login': typeof LoginIndexRoute
   '/products': typeof ProductsIndexRoute
   '/users': typeof UsersIndexRoute
+  '/products/edit/$id': typeof ProductsEditIdRoute
   '/users/edit/$id': typeof UsersEditIdRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/wsTest': typeof WsTestRoute
+  '/categories/new': typeof CategoriesNewRoute
   '/login/verify': typeof LoginVerifyRoute
   '/products/new': typeof ProductsNewRoute
   '/users/new': typeof UsersNewRoute
+  '/categories': typeof CategoriesIndexRoute
   '/login': typeof LoginIndexRoute
   '/products': typeof ProductsIndexRoute
   '/users': typeof UsersIndexRoute
+  '/products/edit/$id': typeof ProductsEditIdRoute
   '/users/edit/$id': typeof UsersEditIdRoute
 }
 
@@ -177,12 +225,15 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/wsTest': typeof WsTestRoute
+  '/categories/new': typeof CategoriesNewRoute
   '/login/verify': typeof LoginVerifyRoute
   '/products/new': typeof ProductsNewRoute
   '/users/new': typeof UsersNewRoute
+  '/categories/': typeof CategoriesIndexRoute
   '/login/': typeof LoginIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/users/': typeof UsersIndexRoute
+  '/products/edit/$id': typeof ProductsEditIdRoute
   '/users/edit/$id': typeof UsersEditIdRoute
 }
 
@@ -191,34 +242,43 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/wsTest'
+    | '/categories/new'
     | '/login/verify'
     | '/products/new'
     | '/users/new'
+    | '/categories'
     | '/login'
     | '/products'
     | '/users'
+    | '/products/edit/$id'
     | '/users/edit/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/wsTest'
+    | '/categories/new'
     | '/login/verify'
     | '/products/new'
     | '/users/new'
+    | '/categories'
     | '/login'
     | '/products'
     | '/users'
+    | '/products/edit/$id'
     | '/users/edit/$id'
   id:
     | '__root__'
     | '/'
     | '/wsTest'
+    | '/categories/new'
     | '/login/verify'
     | '/products/new'
     | '/users/new'
+    | '/categories/'
     | '/login/'
     | '/products/'
     | '/users/'
+    | '/products/edit/$id'
     | '/users/edit/$id'
   fileRoutesById: FileRoutesById
 }
@@ -226,24 +286,30 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   WsTestRoute: typeof WsTestRoute
+  CategoriesNewRoute: typeof CategoriesNewRoute
   LoginVerifyRoute: typeof LoginVerifyRoute
   ProductsNewRoute: typeof ProductsNewRoute
   UsersNewRoute: typeof UsersNewRoute
+  CategoriesIndexRoute: typeof CategoriesIndexRoute
   LoginIndexRoute: typeof LoginIndexRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
   UsersIndexRoute: typeof UsersIndexRoute
+  ProductsEditIdRoute: typeof ProductsEditIdRoute
   UsersEditIdRoute: typeof UsersEditIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   WsTestRoute: WsTestRoute,
+  CategoriesNewRoute: CategoriesNewRoute,
   LoginVerifyRoute: LoginVerifyRoute,
   ProductsNewRoute: ProductsNewRoute,
   UsersNewRoute: UsersNewRoute,
+  CategoriesIndexRoute: CategoriesIndexRoute,
   LoginIndexRoute: LoginIndexRoute,
   ProductsIndexRoute: ProductsIndexRoute,
   UsersIndexRoute: UsersIndexRoute,
+  ProductsEditIdRoute: ProductsEditIdRoute,
   UsersEditIdRoute: UsersEditIdRoute,
 }
 
@@ -259,12 +325,15 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/wsTest",
+        "/categories/new",
         "/login/verify",
         "/products/new",
         "/users/new",
+        "/categories/",
         "/login/",
         "/products/",
         "/users/",
+        "/products/edit/$id",
         "/users/edit/$id"
       ]
     },
@@ -273,6 +342,9 @@ export const routeTree = rootRoute
     },
     "/wsTest": {
       "filePath": "wsTest.tsx"
+    },
+    "/categories/new": {
+      "filePath": "categories/new.tsx"
     },
     "/login/verify": {
       "filePath": "login/verify.tsx"
@@ -283,6 +355,9 @@ export const routeTree = rootRoute
     "/users/new": {
       "filePath": "users/new.tsx"
     },
+    "/categories/": {
+      "filePath": "categories/index.tsx"
+    },
     "/login/": {
       "filePath": "login/index.tsx"
     },
@@ -291,6 +366,9 @@ export const routeTree = rootRoute
     },
     "/users/": {
       "filePath": "users/index.tsx"
+    },
+    "/products/edit/$id": {
+      "filePath": "products/edit.$id.tsx"
     },
     "/users/edit/$id": {
       "filePath": "users/edit.$id.tsx"

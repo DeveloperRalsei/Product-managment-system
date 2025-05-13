@@ -6,7 +6,9 @@ export async function isAuthenticated() {
         credentials: "include",
     });
 
-    return res.ok;
+    const data = await res.json();
+    if (!("email" in data)) return false;
+    return res.ok && data.role === "ADMIN" && data.verified;
 }
 
 export const useUser = () => {
@@ -41,7 +43,7 @@ export const useUser = () => {
 };
 
 export const login = async (userCredentials: loginSchema) => {
-    return await fetch("/api/v1/auth/login", {
+    const res = await fetch("/api/v1/auth/login", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -49,6 +51,8 @@ export const login = async (userCredentials: loginSchema) => {
         },
         body: JSON.stringify(userCredentials),
     });
+
+    return res;
 };
 
 export const logout = async () => {

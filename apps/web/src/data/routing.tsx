@@ -1,5 +1,6 @@
 import {
     IconBook,
+    IconList,
     IconShoppingCart,
     IconUsers,
     TablerIconsProps,
@@ -39,6 +40,21 @@ export const links: (navLink & { icon?: React.FC<TablerIconsProps> })[] = [
             {
                 label: "Ekle",
                 path: "/products/new",
+            },
+        ],
+    },
+
+    {
+        label: "Kategoriler",
+        icon: IconList,
+        childs: [
+            {
+                label: "Listele",
+                path: "/categories",
+            },
+            {
+                label: "Ekle",
+                path: "/categories/new",
             },
         ],
     },

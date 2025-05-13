@@ -72,7 +72,7 @@ function RouteComponent() {
                         currency: "TRY",
                         images: [],
                         inStock: true,
-                        innerCategoryId: "",
+                        categoryIDs: [],
                         isActive: true,
                         price: 0,
                         quantity: 0,

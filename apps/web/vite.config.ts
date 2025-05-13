@@ -13,13 +13,11 @@ export default defineConfig(({ mode }) => {
     return {
         plugins: [TanStackRouterVite(), react(), tsconfigPaths()],
         server: {
+            allowedHosts: ["localhost.devrals.xyz"],
             hmr: true,
             proxy: {
                 "/api": {
-                    target:
-                        mode === "development"
-                            ? "http://localhost:3000/"
-                            : env.VITE_API_URL,
+                    target: env.VITE_API_URL,
                     changeOrigin: true,
                 },
                 "/static": {

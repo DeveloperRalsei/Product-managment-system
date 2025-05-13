@@ -1,15 +1,17 @@
 import { Product, productSchema } from "#";
 import {
     Button,
+    Center,
+    Chip,
     Divider,
     FileInput,
     Group,
     Image,
+    InputLabel,
     NumberInput,
     Select,
     SimpleGrid,
     Stack,
-    Tabs,
     TagsInput,
     TextInput,
 } from "@mantine/core";
@@ -20,8 +22,10 @@ import {
     IconCurrencyLira,
 } from "@tabler/icons-react";
 import { Carousel } from "@mantine/carousel";
-import { memo, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Editor } from "./text-editor";
+import { getAllCategories } from "@/utils/api/category";
+import { useQuery } from "@tanstack/react-query";
 
 export type ProductFormValues = Omit<
     Product,
@@ -33,8 +37,6 @@ const currencyValues: Record<Product["currency"], React.ReactNode> = {
     EUR: <IconCurrencyEuro />,
     USD: <IconCurrencyDollar />,
 };
-
-const MemoizedEditor = memo(Editor);
 
 export const ProductForm = ({
     initialValues,
@@ -56,6 +58,11 @@ export const ProductForm = ({
         initialValues,
         validate: zodResolver(productSchema),
         validateInputOnChange: true,
+    });
+
+    const { data: categories, isPending: isCategoriesLoading } = useQuery({
+        queryFn: () => getAllCategories(),
+        queryKey: ["categories"],
     });
 
     const imgURLs = useMemo(
@@ -121,21 +128,40 @@ export const ProductForm = ({
                     </Stack>
                 </SimpleGrid>
                 <Divider label="Açıklama" />
-                <MemoizedEditor
+                <Editor
+                    content={form.values.description}
                     onChange={(content) =>
                         form.setFieldValue("description", content)
                     }
                 />
                 <Divider label="Kategori ve Resimler" />
-                <Tabs mb="md">
-                    <Tabs.List>
-                        <Tabs.Tab value="1">Test Categori</Tabs.Tab>
-                        <Tabs.Tab value="2">Test Categori</Tabs.Tab>
-                    </Tabs.List>
-                    <TextInput label="Ara..." />
-                    <Tabs.Panel value="1">Tab 1</Tabs.Panel>
-                    <Tabs.Panel value="2">Tab 2</Tabs.Panel>
-                </Tabs>
+                <InputLabel>Kategoriler</InputLabel>
+                {isCategoriesLoading ? (
+                    "Kategoriler Yükleniyor"
+                ) : categories ? (
+                    <Chip.Group
+                        multiple
+                        value={form.values.categoryIDs}
+                        onChange={(v) => form.setFieldValue("categoryIDs", v)}
+                    >
+                        {categories.map((cat) => {
+                            const isChecked = form.values.categoryIDs.includes(
+                                cat.id,
+                            );
+                            return (
+                                <Chip
+                                    key={cat.id}
+                                    value={cat.id}
+                                    checked={isChecked}
+                                >
+                                    {cat.name}
+                                </Chip>
+                            );
+                        })}
+                    </Chip.Group>
+                ) : (
+                    "Kategori bulunamadı"
+                )}
                 <TagsInput
                     label="Etiketler"
                     value={form.values.tags}
@@ -152,7 +178,7 @@ export const ProductForm = ({
                             {...form.getInputProps("images")}
                         />
                     </Stack>
-                    {form.values.images.length > 0 && (
+                    {form.values.images.length > 0 ? (
                         <Carousel>
                             {imgURLs.map((url, i) => (
                                 <Carousel.Slide key={url + i}>
@@ -166,6 +192,16 @@ export const ProductForm = ({
                                 </Carousel.Slide>
                             ))}
                         </Carousel>
+                    ) : (
+                        <Center
+                            w="100%"
+                            h={200}
+                            style={{
+                                border: "1px solid var(--mantine-color-default-border)",
+                            }}
+                        >
+                            Resim Yok
+                        </Center>
                     )}
                 </SimpleGrid>
             </Stack>

@@ -18,8 +18,12 @@ export const authUser: MiddlewareHandler = async (c) => {
         });
     }
 
-    const user = await verify(sessionCookie, process.env.JWT_TOKEN!);
-    return c.json(user);
+    const { password, ...rest } = await verify(
+        sessionCookie,
+        process.env.JWT_TOKEN!,
+    );
+
+    return c.json(rest);
 };
 
 export const loginUser: MiddlewareHandler = async (c) => {

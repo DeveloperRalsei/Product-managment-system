@@ -12,12 +12,13 @@ export const productSchema = z.object({
     name: z.string().nonempty("Ürün ismi zorunludur"),
     description: z
         .string()
-        .max(400, "Açıklama en fazla 400 karakter olabilir")
+        .max(5000, "Açıklama en fazla 5000 karakter olabilir")
         .optional(),
     price: z.coerce.number().nonnegative("Zarar etmek istiyorsun herhalde :)"),
     currency: currencyEnum.default("TRY"),
     inStock: z.coerce.boolean().default(true),
     isActive: z.coerce.boolean().default(true),
+    categoryIDs: z.array(z.string()),
     quantity: z.coerce
         .number()
         .int("Geçersiz değer")
@@ -52,5 +53,12 @@ export const productSchema = z.object({
         .default([]),
     createdAt: z.coerce.date().optional(),
     updatedAt: z.coerce.date().optional(),
-    innerCategoryId: z.string(),
+});
+
+export const categorySchema = z.object({
+    name: z.string().nonempty("Kategori ismi zorunludur"),
+    bannerUrl: z.string().optional(),
+    logoUrl: z.string().optional(),
+    productIDs: z.array(z.string()),
+    parentCategoryId: z.string().optional(),
 });

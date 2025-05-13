@@ -1,7 +1,7 @@
 import { useBreadCrumbs } from "@/components/ui/page/BreadCrumbs";
 import { ProductTable } from "@/components/ui/tables/product-table";
 import { getAllProducts } from "@/utils/api/product";
-import { Divider, Image, Stack, TextInput, Title } from "@mantine/core";
+import { Stack, TextInput } from "@mantine/core";
 import { nprogress } from "@mantine/nprogress";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
@@ -17,7 +17,11 @@ function RouteComponent() {
     useEffect(() => {
         change([{ label: "Ürünler", to: "/products" }]);
     }, []);
-    const { data: products, isPending } = useQuery({
+    const {
+        data: products,
+        isPending,
+        refetch,
+    } = useQuery({
         queryKey: ["products"],
         queryFn: async () => {
             nprogress.start();
@@ -29,7 +33,7 @@ function RouteComponent() {
 
     const filteredProducts = search
         ? products?.filter((v, i) =>
-              [v.name, v.category, v.description, v.price, v.quantity, i + 1]
+              [v.name, v.description, v.price, v.quantity, i + 1]
                   .filter((x) => x)
                   .join(" ")
                   .toLowerCase()
@@ -38,14 +42,17 @@ function RouteComponent() {
         : products;
 
     return (
-        <Stack>
+        <Stack p="md">
             <TextInput
                 label="Ara..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
             />
             {isPending && "Yükleniyor..."}
-            <ProductTable products={filteredProducts || []} />
+            <ProductTable
+                products={filteredProducts || []}
+                refetchFunc={refetch}
+            />
         </Stack>
     );
 }

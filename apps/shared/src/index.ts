@@ -36,23 +36,16 @@ export type Product = {
     isActive: boolean;
     quantity: number;
     images: string[];
-    category: InnerCategory;
-    innerCategoryId: string;
     tags: string[];
+    categoryIDs: string[];
 };
 
 export type Category = {
     id: string;
     name: string;
-    innerCategories: InnerCategory[];
-};
-
-export type InnerCategory = {
-    id: string;
-    name: string;
-    products: Product[];
-    category: Category;
-    categoryId: String;
+    bannerUrl?: string;
+    logoUrl?: string;
+    parentCategoryIds: string[];
 };
 
 export const MAX_UPLOAD_SIZE = 1024 * 1024 * 50, // 50m MB

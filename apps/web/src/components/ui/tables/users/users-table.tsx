@@ -113,7 +113,7 @@ export const UsersTable = ({
 
     return (
         <Table.ScrollContainer minWidth="100%">
-            <Table withColumnBorders withTableBorder withRowBorders striped>
+            <Table withRowBorders striped>
                 <Table.Thead>
                     <Table.Tr>
                         <Table.Th>#</Table.Th>

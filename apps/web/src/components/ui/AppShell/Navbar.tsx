@@ -72,7 +72,9 @@ export const Navbar = ({ close }: { close: () => void }) => {
                                             handleClose(childLink.path, i);
                                             setChildActive(j);
                                         }}
-                                        active={j === childActive}
+                                        active={
+                                            i === active && j === childActive
+                                        }
                                     />
                                 ))}
                             </NavLink>

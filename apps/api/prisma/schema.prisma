@@ -25,34 +25,27 @@ model User {
 }
 
 model Product {
-    id              String        @id @default(auto()) @map("_id") @db.ObjectId
-    name            String
-    description     String?
-    price           Float
-    currency        Currency      @default(TRY)
-    inStock         Boolean       @default(true)
-    isActive        Boolean       @default(true)
-    quantity        Int           @default(0)
-    images          String[]
-    category        InnerCategory @relation(fields: [innerCategoryId], references: [id])
-    tags            String[]
-    createdAt       DateTime      @default(now())
-    updatedAt       DateTime      @updatedAt
-    innerCategoryId String        @db.ObjectId
+    id          String   @id @default(auto()) @map("_id") @db.ObjectId
+    name        String
+    description String?
+    price       Float
+    currency    Currency @default(TRY)
+    inStock     Boolean  @default(true)
+    isActive    Boolean  @default(true)
+    quantity    Int      @default(0)
+    images      String[]
+    tags        String[]
+    categoryIDs String[] @db.ObjectId
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
 }
 
 model Category {
-    id              String          @id @default(auto()) @map("_id") @db.ObjectId
-    name            String
-    innerCategories InnerCategory[]
-}
-
-model InnerCategory {
-    id         String    @id @default(auto()) @map("_id") @db.ObjectId
-    name       String
-    products   Product[]
-    category   Category? @relation(fields: [categoryId], references: [id])
-    categoryId String?   @db.ObjectId
+    id               String  @id @default(auto()) @map("_id") @db.ObjectId
+    name             String
+    bannerUrl        String?
+    logoUrl          String?
+    parentCategoryId String? @db.ObjectId
 }
 
 enum Currency {

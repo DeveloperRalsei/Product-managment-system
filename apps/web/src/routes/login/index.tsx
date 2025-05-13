@@ -1,4 +1,4 @@
-import { wait, zodLoginSchema } from "#";
+import { User, wait, zodLoginSchema } from "#";
 import { isAuthenticated, login } from "@/utils/api/auth";
 import {
     Button,
