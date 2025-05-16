@@ -1,5 +1,5 @@
 import {
-    IconBook,
+    IconHome,
     IconList,
     IconShoppingCart,
     IconUsers,
@@ -9,9 +9,9 @@ import { navLink } from "../types";
 
 export const links: (navLink & { icon?: React.FC<TablerIconsProps> })[] = [
     {
-        label: "Kılavuz",
+        label: "Ana Sayfa",
         path: "/",
-        icon: IconBook,
+        icon: IconHome,
     },
 
     {

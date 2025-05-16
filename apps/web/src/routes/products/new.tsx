@@ -36,29 +36,29 @@ function RouteComponent() {
             });
         },
         onSuccess: ({ ok, status }) => {
-            if (ok) {
-                showNotification({
+            if (ok)
+                return showNotification({
                     message: "Yeni ürün ekleme başarılı",
                     color: "green",
                 });
-                return;
-            }
 
-            if (status === 401) {
-                showNotification({
+            if (status === 401)
+                return showNotification({
                     message: "Buna yetkiniz yok",
                     color: "red",
                 });
-                return;
-            }
 
-            if (!ok) {
-                showNotification({
+            if (status === 403)
+                return showNotification({
+                    message: "Farklı bir barkod deneyin",
+                    color: "red",
+                });
+
+            if (!ok)
+                return showNotification({
                     color: "red",
                     message: "Birşey ters gitti",
                 });
-                return;
-            }
         },
     });
 
@@ -77,6 +77,7 @@ function RouteComponent() {
                         price: 0,
                         quantity: 0,
                         tags: [],
+                        barcode: 0,
                     }}
                     isPending={isPending}
                     onSubmit={(v) => mutate(v)}

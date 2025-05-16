@@ -1,7 +1,14 @@
 import { Product } from "#";
 import { deleteProductById } from "@/utils/api/product";
 import { Carousel } from "@mantine/carousel";
-import { ActionIcon, Image, Table, Text } from "@mantine/core";
+import {
+    ActionIcon,
+    Box,
+    Image,
+    NumberFormatter,
+    Table,
+    Text,
+} from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import { nprogress } from "@mantine/nprogress";
 import {
@@ -34,6 +41,7 @@ export const ProductTable = ({
                         <Table.Th w={1}>#</Table.Th>
                         <Table.Th w={30}>Resim</Table.Th>
                         <Table.Th miw={130}>Ürün Adı</Table.Th>
+                        <Table.Th>Barkod</Table.Th>
                         <Table.Th miw={70}>Fiyat</Table.Th>
                         <Table.Th miw={70}>Stok</Table.Th>
                         <Table.Th>Aktif mi?</Table.Th>
@@ -68,10 +76,21 @@ export const ProductTable = ({
                                     ))}
                                 </Carousel>
                             </Table.Td>
-                            <Table.Td>
-                                <Text span fz="lg" ta="center">
+                            <Table.Td maw={120}>
+                                <Text
+                                    truncate="end"
+                                    fz="lg"
+                                    fw="bold"
+                                    ta="center"
+                                >
                                     {p.name}
                                 </Text>
+                            </Table.Td>
+                            <Table.Td>
+                                <NumberFormatter
+                                    value={p.barcode}
+                                    thousandSeparator=" "
+                                />
                             </Table.Td>
                             <Table.Td>
                                 {p.price} {currencyIcon[p.currency]}

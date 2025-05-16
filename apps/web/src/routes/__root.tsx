@@ -45,7 +45,6 @@ function RootComponent() {
         <>
             <HeadContent />
             <Layout>
-                <BreadCrumbs m="lg" />
                 <Outlet />
             </Layout>
         </>

@@ -15,10 +15,23 @@ export const productSchema = z.object({
         .max(5000, "Açıklama en fazla 5000 karakter olabilir")
         .optional(),
     price: z.coerce.number().nonnegative("Zarar etmek istiyorsun herhalde :)"),
+    barcode: z.coerce
+        .number({
+            required_error: "Barkod zorunludur",
+            invalid_type_error: "Lütfen geçerli bir değer giriniz",
+        })
+        .int("Ondalıklı sayı geçersizdir")
+        .nonnegative("Negatif değer geçerli değil")
+        .refine((v) => v.toString().length === 12, {
+            message: "Barkod 12 karakter olmalı",
+        }),
     currency: currencyEnum.default("TRY"),
     inStock: z.coerce.boolean().default(true),
     isActive: z.coerce.boolean().default(true),
-    categoryIDs: z.array(z.string()),
+    categoryIDs: z
+        .union([z.string(), z.array(z.string())])
+        .transform((val) => (Array.isArray(val) ? val : [val]))
+        .refine((arr) => arr.length > 0, "En az bir kategori seçmelisiniz"),
     quantity: z.coerce
         .number()
         .int("Geçersiz değer")
@@ -47,6 +60,7 @@ export const productSchema = z.object({
                 }
             });
         }),
+    videoUrl: z.string().optional(),
     tags: z
         .union([z.array(z.string()), z.string()])
         .transform((val) => (Array.isArray(val) ? val : [val]))

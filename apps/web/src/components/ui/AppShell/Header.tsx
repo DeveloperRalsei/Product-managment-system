@@ -1,6 +1,7 @@
 import { AppShellHeader, Burger, Group, Text } from "@mantine/core";
 import { ColorSchemeToggle } from "..";
 import { FullscreenToggle } from "../FullScreenToggle";
+import { BreadCrumbs } from "../page/BreadCrumbs";
 
 export const Header = ({
     navbar,
@@ -15,7 +16,7 @@ export const Header = ({
                     onClick={navbar.toggle}
                     hiddenFrom="sm"
                 />
-                <Text fz={"h2"}>App</Text>
+                <BreadCrumbs />
             </Group>
             <Group>
                 <FullscreenToggle />

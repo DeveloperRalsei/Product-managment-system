@@ -28,7 +28,7 @@ function RouteComponent() {
                 <CategoryForm
                     initialValues={{
                         name: "",
-                        parentCategoryIds: [],
+                        productIDs: [],
                     }}
                     onSubmit={console.log}
                 />

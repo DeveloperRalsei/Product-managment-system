@@ -32,21 +32,23 @@ function RouteComponent() {
             });
         },
         onSuccess: ({ ok, status }) => {
-            if (status === 401) {
-                showNotification({
+            if (status === 401)
+                return showNotification({
                     message: "Buna yetkiniz yok",
                     color: "red",
                 });
-                return;
-            }
 
-            if (!ok) {
-                showNotification({
+            if (status === 403)
+                return showNotification({
+                    message: "Farklı bir barkod girin",
+                    color: "red",
+                });
+
+            if (!ok)
+                return showNotification({
                     message: "Birşey ters gitti",
                     color: "red",
                 });
-                return;
-            }
 
             showNotification({
                 message: "Ürün güncellendi",

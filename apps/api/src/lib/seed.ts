@@ -1,26 +1,16 @@
+// @ts-ignore
 import { PrismaClient } from "#/prisma";
 
 const prisma = new PrismaClient();
 
 async function main() {
-    const category = await prisma.category.create({
-        data: {
-            name: "Elektronik",
-        },
-    });
-
-    const innerCategory = await prisma.innerCategory.create({
-        data: {
-            name: "Kulaklık",
-            categoryId: category.id,
-        },
-    });
-
-    console.log("Kategori oluşturuldu:", category);
-    console.log("Alt Kategori oluşturuldu:", innerCategory);
+    return await prisma.product.deleteMany();
 }
 
 main()
+    .then((res) => {
+        console.log("Deleted all products successfuly: COUNT: " + res.count);
+    })
     .catch((e) => {
         console.error("Seed sırasında hata:", e);
         process.exit(1);

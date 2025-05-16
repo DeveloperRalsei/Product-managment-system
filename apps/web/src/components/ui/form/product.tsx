@@ -1,6 +1,7 @@
 import { Product, productSchema } from "#";
 import {
     Button,
+    Text,
     Center,
     Chip,
     Divider,
@@ -20,6 +21,7 @@ import {
     IconCurrencyDollar,
     IconCurrencyEuro,
     IconCurrencyLira,
+    IconHash,
 } from "@tabler/icons-react";
 import { Carousel } from "@mantine/carousel";
 import { useEffect, useMemo } from "react";
@@ -125,6 +127,13 @@ export const ProductForm = ({
                             allowDeselect={false}
                             {...form.getInputProps("currency")}
                         />
+                        <NumberInput
+                            label="Barkod"
+                            withAsterisk
+                            leftSection={<IconHash />}
+                            thousandSeparator=" "
+                            {...form.getInputProps("barcode")}
+                        />
                     </Stack>
                 </SimpleGrid>
                 <Divider label="Açıklama" />
@@ -161,6 +170,9 @@ export const ProductForm = ({
                     </Chip.Group>
                 ) : (
                     "Kategori bulunamadı"
+                )}
+                {form.errors.categoryIDs && (
+                    <Text c="red">{form.errors.categoryIDs}</Text>
                 )}
                 <TagsInput
                     label="Etiketler"
@@ -202,6 +214,12 @@ export const ProductForm = ({
                         >
                             Resim Yok
                         </Center>
+                    )}
+                    {import.meta.env.DEV && form.errors && (
+                        <pre>{JSON.stringify(form.errors, null, 4)}</pre>
+                    )}
+                    {import.meta.env.DEV && (
+                        <pre>{JSON.stringify(form.values, null, 4)}</pre>
                     )}
                 </SimpleGrid>
             </Stack>

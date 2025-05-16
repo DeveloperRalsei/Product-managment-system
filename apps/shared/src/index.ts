@@ -1,3 +1,6 @@
+import { z } from "zod";
+import { categorySchema, productSchema } from "./zodSchemas";
+
 export * from "./utils";
 export * from "./zodSchemas";
 
@@ -26,28 +29,11 @@ export enum Currency {
     USD,
 }
 
-export type Product = {
+export type Product = Omit<z.infer<typeof productSchema>, "images"> & {
     id: string;
-    name: string;
-    description?: string;
-    price: number;
-    currency: keyof typeof Currency;
-    inStock: boolean;
-    isActive: boolean;
-    quantity: number;
     images: string[];
-    tags: string[];
-    categoryIDs: string[];
 };
-
-export type Category = {
-    id: string;
-    name: string;
-    bannerUrl?: string;
-    logoUrl?: string;
-    parentCategoryIds: string[];
-};
-
+export type Category = z.infer<typeof categorySchema> & { id: string };
 export const MAX_UPLOAD_SIZE = 1024 * 1024 * 50, // 50m MB
     ACCEPTED_FILE_TYPES = [
         "application/json",

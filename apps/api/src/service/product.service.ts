@@ -17,6 +17,7 @@ const defaultSelectValues: Prisma.ProductSelect = {
     quantity: true,
     categoryIDs: true,
     images: true,
+    barcode: true,
 };
 
 const getAll = async (q?: string) =>

@@ -2,7 +2,7 @@ import { MiddlewareHandler } from "hono";
 import { verify, sign } from "hono/jwt";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { ZodError } from "zod";
-import { loginSchema } from "#";
+import { loginSchema, tryCatch } from "#";
 import prisma from "~/lib/prisma";
 import { generateVerificationCode } from "~/utils/auth";
 import resend from "~/lib/resend";
@@ -60,6 +60,7 @@ export const loginUser: MiddlewareHandler = async (c) => {
 
         return c.json(user);
     } catch (error) {
+        console.log(error);
         if (error instanceof Error) {
             switch (error.message) {
                 case "404":
@@ -104,100 +105,97 @@ export const verifyUser: MiddlewareHandler = async (c) => {
         );
     }
 
-    try {
-        const user = await prisma.user.findUnique({
-            where: { email },
-        });
+    const [user, error] = await tryCatch(() =>
+        prisma.user.findUnique({ where: { email } }),
+    );
+    if (error) return c.json({ error }, 400);
 
-        if (!user) return c.json({ message: "User not found" }, 404);
+    if (!user) return c.json({ message: "User not found" }, 404);
 
-        if (!user.verified) {
-            if (user.emailVerificationCode !== code) {
-                return c.json({ message: "Invalid verification code" }, 401);
-            }
-
-            if (user.emailVerificationExpires! < new Date()) {
-                return c.json({ message: "Verification code expired" }, 400);
-            }
-
-            await prisma.user.update({
-                where: { email },
-                data: {
-                    verified: true,
-                    emailVerificationCode: null,
-                    emailVerificationExpires: null,
-                },
-            });
+    if (!user.verified) {
+        if (user.emailVerificationCode !== code) {
+            return c.json({ message: "Invalid verification code" }, 401);
         }
 
-        const {
-            password,
-            emailVerificationCode,
-            emailVerificationExpires,
-            ...rest
-        } = user;
-        const sessionCookie = await sign(rest, process.env.JWT_TOKEN!);
+        if (user.emailVerificationExpires! < new Date()) {
+            return c.json({ message: "Verification code expired" }, 400);
+        }
 
-        setCookie(c, "session-cookie", sessionCookie, {
-            httpOnly: true,
-            maxAge: 60 * 60 * 6,
-            path: "/",
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+        await prisma.user.update({
+            where: { email },
+            data: {
+                verified: true,
+                emailVerificationCode: null,
+                emailVerificationExpires: null,
+            },
         });
-
-        return c.json({ message: "User verified and logged in", user: rest });
-    } catch (error) {
-        c.status(400);
-        return c.json({ error });
     }
+
+    const {
+        password,
+        emailVerificationCode,
+        emailVerificationExpires,
+        ...rest
+    } = user;
+    const sessionCookie = await sign(rest, process.env.JWT_TOKEN!);
+
+    setCookie(c, "session-cookie", sessionCookie, {
+        httpOnly: true,
+        maxAge: 60 * 60 * 6,
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+    });
+
+    return c.json({ message: "User verified and logged in", user: rest });
 };
 
 export const sendEmailVerification: MiddlewareHandler = async (c) => {
     const email = await c.req.text();
     const code = generateVerificationCode();
 
-    try {
-        const user = await prisma.user.findUnique({ where: { email } });
-        if (!user) return c.json({ message: "User not found" }, 404);
-
-        await prisma.user.update({
-            where: { email: user.email },
-            data: {
-                emailVerificationCode: code,
-                emailVerificationExpires: new Date(Date.now() + 1000 * 60 * 5),
-            },
-        });
-
-        if (!process.env.RESEND_DOMAIN)
-            return c.json({ message: "RESEND_DOMAIN not defined" }, 400);
-
-        const resendResponse = await resend.emails.send({
-            from: `noreply@${process.env.RESEND_DOMAIN}`,
-            to: user.email,
-            subject: "Hesap doğrulama",
-            text: `Doğrulama kodun: ${code}`,
-        });
-
-        if (resendResponse.error) {
-            return c.json(
-                {
-                    message: "Email verification failed",
-                    error: resendResponse.error,
-                },
-                400,
-            );
-        }
-
-        return c.json({
-            message: "Verification code sended",
-        });
-    } catch (error) {
+    const [user, error] = await tryCatch(() =>
+        prisma.user.findUnique({ where: { email } }),
+    );
+    if (error)
         return c.json(
             {
                 error,
             },
             400,
         );
+
+    if (!user) return c.json({ message: "User not found" }, 404);
+
+    await prisma.user.update({
+        where: { email: user.email },
+        data: {
+            emailVerificationCode: code,
+            emailVerificationExpires: new Date(Date.now() + 1000 * 60 * 5),
+        },
+    });
+
+    if (!process.env.RESEND_DOMAIN)
+        return c.json({ message: "RESEND_DOMAIN not defined" }, 400);
+
+    const resendResponse = await resend.emails.send({
+        from: `noreply@${process.env.RESEND_DOMAIN}`,
+        to: user.email,
+        subject: "Hesap doğrulama",
+        text: `Doğrulama kodun: ${code}`,
+    });
+
+    if (resendResponse.error) {
+        return c.json(
+            {
+                message: "Email verification failed",
+                error: resendResponse.error,
+            },
+            400,
+        );
     }
+
+    return c.json({
+        message: "Verification code sended",
+    });
 };
