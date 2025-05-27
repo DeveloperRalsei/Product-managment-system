@@ -215,14 +215,9 @@ export const ProductForm = ({
                             Resim Yok
                         </Center>
                     )}
-                    {import.meta.env.DEV && form.errors && (
-                        <pre>{JSON.stringify(form.errors, null, 4)}</pre>
-                    )}
-                    {import.meta.env.DEV && (
-                        <pre>{JSON.stringify(form.values, null, 4)}</pre>
-                    )}
                 </SimpleGrid>
             </Stack>
+            <pre>{JSON.stringify(form.errors, null, 2)}</pre>
             <Group mt="sm">
                 <Button onClick={form.reset} variant="default">
                     Sıfırla

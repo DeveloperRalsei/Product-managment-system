@@ -1,16 +1,18 @@
 // @ts-ignore
 import { PrismaClient } from "#/prisma";
+import { encryptPassword } from "~/utils";
 
 const prisma = new PrismaClient();
 
 async function main() {
-    return await prisma.product.deleteMany();
+    return prisma.category.create({
+        data: {
+            name: "Kolonyalar",
+        },
+    });
 }
 
 main()
-    .then((res) => {
-        console.log("Deleted all products successfuly: COUNT: " + res.count);
-    })
     .catch((e) => {
         console.error("Seed sırasında hata:", e);
         process.exit(1);

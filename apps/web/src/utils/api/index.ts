@@ -1,0 +1,1 @@
+const defaultPage = 1;

@@ -1,5 +1,6 @@
 import { User, wait, zodLoginSchema } from "#";
 import { isAuthenticated, login } from "@/utils/api/auth";
+import { notifyWithResponse } from "@/utils/notifications";
 import {
     Button,
     Paper,
@@ -52,17 +53,9 @@ function RouteComponent() {
     const handleSubmit = async (v: { email: string; password: string }) => {
         setLoading(true);
         try {
-            const { ok, status } = await login(v);
+            const res = await login(v);
 
-            if (status === 401 || status === 404) {
-                showNotification({
-                    color: "red",
-                    message: "Kullanıcı adı veya şifre yanlış",
-                });
-                return;
-            }
-
-            if (status === 403) {
+            if (res.status === 403) {
                 sessionStorage.setItem("pending_email", form.getValues().email);
                 navigate({
                     to: "/login/verify",
@@ -72,18 +65,11 @@ function RouteComponent() {
                 return;
             }
 
-            if (!ok) {
-                showNotification({
-                    color: "red",
-                    message: "Birşey ters gitti",
-                });
+            if (!res.ok) {
+                notifyWithResponse(res);
                 return;
             }
 
-            showNotification({
-                message: "Giriş başarılı",
-                color: "green",
-            });
             await wait(500);
             navigate({
                 to: redirect || "/",

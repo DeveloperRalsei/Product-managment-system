@@ -1,6 +1,8 @@
+import { Product } from "#";
 import { useBreadCrumbs } from "@/components/ui/page/BreadCrumbs";
 import { ProductTable } from "@/components/ui/tables/product-table";
 import { getAllProducts } from "@/utils/api/product";
+import { notifyWithResponse } from "@/utils/notifications";
 import { Stack, TextInput } from "@mantine/core";
 import { nprogress } from "@mantine/nprogress";
 import { useQuery } from "@tanstack/react-query";
@@ -25,9 +27,10 @@ function RouteComponent() {
         queryKey: ["products"],
         queryFn: async () => {
             nprogress.start();
-            const products = await getAllProducts();
+            const res = await getAllProducts();
+            if (!res.ok) notifyWithResponse(res);
             nprogress.complete();
-            return products;
+            return (await res.json()) as Product[];
         },
     });
 

@@ -18,20 +18,31 @@ const defaultSelectValues: Prisma.ProductSelect = {
     categoryIDs: true,
     images: true,
     barcode: true,
+    rating: true,
+    videoUrl: true,
+    brand: true,
 };
 
-const getAll = async (q?: string) =>
-    await prisma.product.findMany({
-        where: q
-            ? {
-                  OR: [
-                      { name: { contains: q, mode: "insensitive" } },
-                      { description: { contains: q, mode: "insensitive" } },
-                  ],
-              }
-            : {},
+const ITEM_COUNT_PER_PAGE = 20;
+
+const getAll = async (q?: string, page = 1) => {
+    const currentPage = Math.max(1, page);
+    const where: Prisma.ProductWhereInput = q
+        ? {
+              OR: [
+                  { name: { contains: q, mode: "insensitive" } },
+                  { description: { contains: q, mode: "insensitive" } },
+              ],
+          }
+        : {};
+
+    return prisma.product.findMany({
+        where,
+        skip: (currentPage - 1) * ITEM_COUNT_PER_PAGE || 0,
+        take: ITEM_COUNT_PER_PAGE,
         select: defaultSelectValues,
     });
+};
 
 const getOneById = async (id: string) =>
     await prisma.product.findUnique({

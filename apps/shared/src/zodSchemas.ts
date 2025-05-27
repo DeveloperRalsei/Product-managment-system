@@ -8,6 +8,11 @@ export const zodLoginSchema = z.object({
 
 export const currencyEnum = z.enum(["USD", "TRY", "EUR"]);
 
+export const brandSchema = z.object({
+    name: z.string().nonempty("Marka ismi zorunludur"),
+    logoUrl: z.string().optional(),
+});
+
 export const productSchema = z.object({
     name: z.string().nonempty("Ürün ismi zorunludur"),
     description: z
@@ -28,6 +33,7 @@ export const productSchema = z.object({
     currency: currencyEnum.default("TRY"),
     inStock: z.coerce.boolean().default(true),
     isActive: z.coerce.boolean().default(true),
+    brandID: z.string().optional(),
     categoryIDs: z
         .union([z.string(), z.array(z.string())])
         .transform((val) => (Array.isArray(val) ? val : [val]))
@@ -60,7 +66,7 @@ export const productSchema = z.object({
                 }
             });
         }),
-    videoUrl: z.string().optional(),
+    videoUrl: z.coerce.string().optional(),
     tags: z
         .union([z.array(z.string()), z.string()])
         .transform((val) => (Array.isArray(val) ? val : [val]))

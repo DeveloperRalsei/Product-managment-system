@@ -2,8 +2,10 @@ import { Product } from "#";
 import { ProductFormValues } from "@/components/ui/form/product";
 import { objectToFormData } from "../createFormData";
 
-export const getAllProducts = async (q?: string): Promise<Product[]> =>
-    (await fetch(`/api/v1/product${q ? `?q=${q}` : ""}`)).json();
+export const getAllProducts = async (q?: string, page?: number) =>
+    await fetch(
+        `/api/v1/product${q ? `?q=${q}` : ""}${page ? `&page=${page}` : ""}`,
+    );
 
 export const createNewProduct = async (p: ProductFormValues) => {
     const formData = objectToFormData(p);

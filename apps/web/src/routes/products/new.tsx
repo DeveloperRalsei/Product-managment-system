@@ -1,6 +1,7 @@
 import { ProductFormValues } from "@/components/ui/form/product";
 import { useBreadCrumbs } from "@/components/ui/page/BreadCrumbs";
 import { createNewProduct } from "@/utils/api/product";
+import { notifyWithResponse } from "@/utils/notifications";
 import { Stack } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import { useMutation } from "@tanstack/react-query";
@@ -35,31 +36,7 @@ function RouteComponent() {
                 message: "Birşey ters gitti",
             });
         },
-        onSuccess: ({ ok, status }) => {
-            if (ok)
-                return showNotification({
-                    message: "Yeni ürün ekleme başarılı",
-                    color: "green",
-                });
-
-            if (status === 401)
-                return showNotification({
-                    message: "Buna yetkiniz yok",
-                    color: "red",
-                });
-
-            if (status === 403)
-                return showNotification({
-                    message: "Farklı bir barkod deneyin",
-                    color: "red",
-                });
-
-            if (!ok)
-                return showNotification({
-                    color: "red",
-                    message: "Birşey ters gitti",
-                });
-        },
+        onSuccess: (res) => notifyWithResponse(res),
     });
 
     return (

@@ -5,19 +5,19 @@ generator client {
 }
 
 datasource db {
-    provider = "mongodb"
+    provider = "postgresql"
     url      = env("DATABASE_URL")
 }
 
 model User {
-    id                       String    @id @default(auto()) @map("_id") @db.ObjectId
+    id                       Int       @id @default(autoincrement())
     email                    String    @unique
     phoneNumber              Int?
     name                     String
     password                 String
     role                     Role      @default(USER)
     emailVerificationCode    String?
-    emailVerificationExpires DateTime? @db.Date
+    emailVerificationExpires DateTime?
     verified                 Boolean?  @default(false)
     deleted                  Boolean   @default(false)
     createdAt                DateTime  @default(now())
@@ -25,7 +25,7 @@ model User {
 }
 
 model Product {
-    id          String   @id @default(auto()) @map("_id") @db.ObjectId
+    id          Int      @id @default(autoincrement())
     name        String
     barcode     Int      @unique
     description String?
@@ -38,17 +38,40 @@ model Product {
     videoUrl    String?
     tags        String[]
     rating      Int      @default(0)
-    categoryIDs String[] @db.ObjectId
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+
+    categories ProductCategory[]
+    brand      Brand?            @relation(fields: [brandID], references: [id])
+    brandID    Int?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model Category {
-    id               String   @id @default(auto()) @map("_id") @db.ObjectId
+    id               Int               @id @default(autoincrement())
     name             String
     bannerUrl        String?
     logoUrl          String?
-    childCategoryIDs String[] @db.ObjectId
+    products         ProductCategory[]
+    childCategories  Category[]        @relation("CategoryChildren")
+    parentCategory   Category?         @relation("CategoryChildren", fields: [parentCategoryID], references: [id])
+    parentCategoryID Int?
+}
+
+model ProductCategory {
+    product    Product  @relation(fields: [productId], references: [id])
+    productId  Int
+    category   Category @relation(fields: [categoryId], references: [id])
+    categoryId Int
+
+    @@id([productId, categoryId]) // Composite primary key
+}
+
+model Brand {
+    id       Int       @id @default(autoincrement())
+    name     String
+    logoUrl  String?
+    products Product[]
 }
 
 enum Currency {

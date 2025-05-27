@@ -1,5 +1,6 @@
 import { ProductForm, ProductFormValues } from "@/components/ui/form/product";
 import { getProductById, updateProductById } from "@/utils/api/product";
+import { notifyWithResponse } from "@/utils/notifications";
 import { Stack } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -31,29 +32,14 @@ function RouteComponent() {
                 color: "red",
             });
         },
-        onSuccess: ({ ok, status }) => {
-            if (status === 401)
-                return showNotification({
-                    message: "Buna yetkiniz yok",
-                    color: "red",
-                });
-
+        onSuccess: ({ ok, status, ...rest }) => {
             if (status === 403)
                 return showNotification({
                     message: "Farklı bir barkod girin",
                     color: "red",
                 });
 
-            if (!ok)
-                return showNotification({
-                    message: "Birşey ters gitti",
-                    color: "red",
-                });
-
-            showNotification({
-                message: "Ürün güncellendi",
-                color: "green",
-            });
+            if (!ok) notifyWithResponse({ ...rest, status, ok });
         },
     });
     const [images, setImages] = useState<File[]>([]);

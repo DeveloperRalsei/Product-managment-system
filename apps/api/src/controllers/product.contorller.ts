@@ -6,10 +6,12 @@ import productService from "~/service/product.service";
 import { ProductInput } from "~/types";
 
 export const getAllProducts: MiddlewareHandler = async (c) => {
-    const q = c.req.query("q");
-    const [products, error] = await tryCatch(() => productService.getAll(q));
+    const { q, page } = c.req.query();
+    const [result, error] = await tryCatch(() =>
+        productService.getAll(q, Number(page)),
+    );
     if (error) return c.json({ error }, 400);
-    return c.json(products);
+    return c.json(result);
 };
 
 export const getProductById: MiddlewareHandler = async (c) => {
