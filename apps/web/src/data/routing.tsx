@@ -3,11 +3,10 @@ import {
     IconList,
     IconShoppingCart,
     IconUsers,
-    TablerIconsProps,
 } from "@tabler/icons-react";
 import { navLink } from "../types";
 
-export const links: (navLink & { icon?: React.FC<TablerIconsProps> })[] = [
+export const routes: (navLink & { icon: typeof IconHome })[] = [
     {
         label: "Ana Sayfa",
         path: "/",

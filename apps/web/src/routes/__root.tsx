@@ -9,6 +9,7 @@ import { Layout, NotFoundComponent } from "../components";
 import { isAuthenticated } from "@/utils/api/auth";
 import { ErrorComponent } from "@/components/ui/page/ErrorComponent";
 import { BreadCrumbs } from "@/components/ui/page/BreadCrumbs";
+import { NavbarLayout } from "@/components/ui/layout";
 
 function redirectLogin(redirectPath: string = "/") {
     throw redirect({
@@ -44,9 +45,9 @@ function RootComponent() {
     return (
         <>
             <HeadContent />
-            <Layout>
+            <NavbarLayout>
                 <Outlet />
-            </Layout>
+            </NavbarLayout>
         </>
     );
 }

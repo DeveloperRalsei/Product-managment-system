@@ -22,6 +22,7 @@ function RouteComponent() {
         queryFn: () => getProductById(id),
         queryKey: ["product", id],
     });
+
     const { mutate, isPending: isProductPending } = useMutation({
         mutationFn: async (values: ProductFormValues) =>
             updateProductById(id, values),
@@ -77,6 +78,7 @@ function RouteComponent() {
             <ProductForm
                 initialValues={{
                     ...productData,
+                    categoryIDs: productData.categories.map((cat) => cat.id),
                     images,
                 }}
                 isPending={isProductPending || isPending}

@@ -18,7 +18,7 @@ export const getProductById: MiddlewareHandler = async (c) => {
     const id = c.req.param("id");
     if (!id) return c.json({ message: "Proivde an ID" }, 400);
     const [product, error] = await tryCatch(() =>
-        productService.getOneById(id),
+        productService.getOneById(Number(id)),
     );
     if (error) return c.json({ error }, 400);
     return c.json(product ?? null, product ? undefined : 404);
@@ -28,7 +28,7 @@ export const updateProductById = async (c: Context, body: ProductInput) => {
     const id = c.req.param("id");
     if (!id) return c.json({ message: "Proveide an ID" }, 400);
     const [product, error] = await tryCatch(() =>
-        productService.update(id, body, c),
+        productService.update(Number(id), body, c),
     );
     if (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError)
@@ -54,7 +54,7 @@ export const deleteProdutById: MiddlewareHandler = async (c) => {
     const id = c.req.param("id");
     if (!id) return c.json({ message: "No id provided" }, 400);
     const [product, error] = await tryCatch(() =>
-        productService.remove("byId", id),
+        productService.remove("byId", Number(id)),
     );
     if (error) return c.json({ error }, 400);
     return c.json({ message: "Product deleted successfuly", product }, 202);

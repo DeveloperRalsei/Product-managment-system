@@ -45,7 +45,7 @@ function RouteComponent() {
         : products;
 
     return (
-        <Stack p="md">
+        <Stack>
             <TextInput
                 label="Ara..."
                 value={search}

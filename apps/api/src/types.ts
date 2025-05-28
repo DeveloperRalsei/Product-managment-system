@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { User } from "#/prisma";
-import { productSchema } from "#";
+import { categorySchema, productSchema } from "#";
 
 export type AuthUser = {
     id: string;
@@ -10,3 +10,4 @@ export type AuthUser = {
 };
 
 export type ProductInput = z.infer<typeof productSchema>;
+export type CategoryInput = z.infer<typeof categorySchema>;

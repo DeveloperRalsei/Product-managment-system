@@ -4,6 +4,11 @@ generator client {
     output        = "../../shared/src/prisma"
 }
 
+generator zod {
+    provider = "pnpx zod-prisma-types"
+    output   = "../../shared/src/zodSchemas/prisma"
+}
+
 datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
@@ -20,58 +25,49 @@ model User {
     emailVerificationExpires DateTime?
     verified                 Boolean?  @default(false)
     deleted                  Boolean   @default(false)
-    createdAt                DateTime  @default(now())
-    updatedAt                DateTime  @updatedAt
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model Product {
-    id          Int      @id @default(autoincrement())
+    id          Int        @id @default(autoincrement())
     name        String
-    barcode     Int      @unique
+    barcode     String     @unique
     description String?
     price       Float
-    currency    Currency @default(TRY)
-    inStock     Boolean  @default(true)
-    isActive    Boolean  @default(true)
-    quantity    Int      @default(0)
+    currency    Currency   @default(TRY)
+    inStock     Boolean    @default(true)
+    isActive    Boolean    @default(true)
+    quantity    Int        @default(0)
     images      String[]
     videoUrl    String?
     tags        String[]
-    rating      Int      @default(0)
-
-    categories ProductCategory[]
-    brand      Brand?            @relation(fields: [brandID], references: [id])
-    brandID    Int?
+    rating      Int        @default(0)
+    categories  Category[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 
 model Category {
-    id               Int               @id @default(autoincrement())
+    id               Int        @id @default(autoincrement())
     name             String
     bannerUrl        String?
     logoUrl          String?
-    products         ProductCategory[]
-    childCategories  Category[]        @relation("CategoryChildren")
-    parentCategory   Category?         @relation("CategoryChildren", fields: [parentCategoryID], references: [id])
+    products         Product[]
+    childCategories  Category[] @relation("CategoryChildren")
+    parentCategory   Category?  @relation("CategoryChildren", fields: [parentCategoryID], references: [id])
     parentCategoryID Int?
-}
 
-model ProductCategory {
-    product    Product  @relation(fields: [productId], references: [id])
-    productId  Int
-    category   Category @relation(fields: [categoryId], references: [id])
-    categoryId Int
-
-    @@id([productId, categoryId]) // Composite primary key
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model Brand {
-    id       Int       @id @default(autoincrement())
-    name     String
-    logoUrl  String?
-    products Product[]
+    id      Int     @id @default(autoincrement())
+    name    String
+    logoUrl String?
 }
 
 enum Currency {

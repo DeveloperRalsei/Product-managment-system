@@ -1,4 +1,4 @@
-import { Product } from "#";
+import { Category, Product, ProductReturnType } from "#";
 import { ProductFormValues } from "@/components/ui/form/product";
 import { objectToFormData } from "../createFormData";
 
@@ -16,7 +16,9 @@ export const createNewProduct = async (p: ProductFormValues) => {
     });
 };
 
-export const getProductById = async (id: string): Promise<Product | null> =>
+export const getProductById = async (
+    id: string,
+): Promise<ProductReturnType | null> =>
     (await fetch(`/api/v1/product/${id}`)).json();
 
 export const updateProductById = async (id: string, p: ProductFormValues) => {

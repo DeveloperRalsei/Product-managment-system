@@ -15,12 +15,11 @@ const defaultSelectValues: Prisma.ProductSelect = {
     currency: true,
     inStock: true,
     quantity: true,
-    categoryIDs: true,
     images: true,
     barcode: true,
     rating: true,
     videoUrl: true,
-    brand: true,
+    categories: true,
 };
 
 const ITEM_COUNT_PER_PAGE = 20;
@@ -44,22 +43,28 @@ const getAll = async (q?: string, page = 1) => {
     });
 };
 
-const getOneById = async (id: string) =>
+const getOneById = async (id: number) =>
     await prisma.product.findUnique({
         where: { id },
         select: defaultSelectValues,
     });
 
-const create = async ({ images, ...p }: ProductInput, c: Context) => {
+const create = async ({ images, ...productData }: ProductInput, c: Context) => {
     const imgList: string[] = c.get("uploadedFiles");
 
     imgList.forEach((img) => {
         if (img.startsWith(process.cwd())) img = img.replace(process.cwd(), "");
     });
 
-    const data = {
+    const { categoryIDs: _b, ...p } = productData;
+    const data: Prisma.ProductCreateInput = {
         ...p,
         images: imgList,
+        categories: {
+            connect: productData.categoryIDs.map((id) => ({
+                id,
+            })),
+        },
     };
 
     return await prisma.product.create({
@@ -68,9 +73,9 @@ const create = async ({ images, ...p }: ProductInput, c: Context) => {
     });
 };
 
-async function remove(type: "byId", id: string): Promise<Product>;
+async function remove(type: "byId", id: number): Promise<Product>;
 async function remove(type: "multi"): Promise<Product>;
-async function remove(type: "byId" | "multi", id?: string) {
+async function remove(type: "byId" | "multi", id?: number) {
     if (type === "byId") {
         if (!id) throw new Error("ID is required for 'byId'");
         return prisma.product.delete({
@@ -80,16 +85,27 @@ async function remove(type: "byId" | "multi", id?: string) {
     }
 }
 
-async function update(id: string, { images, ...p }: ProductInput, c: Context) {
+async function update(
+    id: number,
+    { images, ...productData }: ProductInput,
+    c: Context,
+) {
     const imgList: string[] = c.get("uploadedFiles");
 
     imgList.forEach((img) => {
         if (img.startsWith(process.cwd())) img = img.replace(process.cwd(), "");
     });
 
-    const data = {
+    const { categoryIDs: _, ...p } = productData;
+
+    const data: Prisma.ProductCreateInput = {
         ...p,
         images: imgList,
+        categories: {
+            connect: productData.categoryIDs.map((id) => ({
+                id,
+            })),
+        },
     };
 
     return await prisma.product.update({

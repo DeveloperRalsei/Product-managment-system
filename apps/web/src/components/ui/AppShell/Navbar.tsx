@@ -8,7 +8,7 @@ import {
     Stack,
     Text,
 } from "@mantine/core";
-import { links } from "apps/web/src/data/routing";
+import { routes } from "@/data/routing";
 import { useNavigate } from "@tanstack/react-router";
 import { logout, useUser } from "@/utils/api/auth";
 import { IconLogout } from "@tabler/icons-react";
@@ -53,7 +53,7 @@ export const Navbar = ({ close }: { close: () => void }) => {
     return (
         <AppShellNavbar>
             <AppShellSection component={Stack} gap={0} grow>
-                {links.map((link, i) => {
+                {routes.map((link, i) => {
                     if ("childs" in link) {
                         return (
                             <NavLink

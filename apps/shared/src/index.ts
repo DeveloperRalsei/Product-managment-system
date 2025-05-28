@@ -33,12 +33,15 @@ export type Product = Omit<z.infer<typeof productSchema>, "images"> & {
     id: string;
     images: string[];
 };
+export type ProductReturnType = Omit<Product, "categoryIDs"> & {
+    categories: (Category & { id: number })[];
+};
 export type Category = z.infer<typeof categorySchema> & { id: string };
+
 export const MAX_UPLOAD_SIZE = 1024 * 1024 * 50, // 50m MB
     ACCEPTED_FILE_TYPES = [
         "application/json",
         "audio/mpeg",
-        "application/pdf",
         "image/svg+xml",
         "text/plain",
         "video/mp4",

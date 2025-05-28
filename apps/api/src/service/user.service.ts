@@ -27,7 +27,9 @@ const findAllUsers = async (q?: string) => {
 
 const findUser = async (emailOrId: string) => {
     const isEmail = emailOrId.includes("@");
-    const identifier = isEmail ? { email: emailOrId } : { id: emailOrId };
+    const identifier = isEmail
+        ? { email: emailOrId }
+        : { id: Number(emailOrId) };
 
     return prisma.user.findUnique({
         where: identifier,
@@ -79,7 +81,9 @@ const createUser = async ({
 
 const deleteUser = async (emailOrId: string, permanently: boolean = false) => {
     const isEmail = emailOrId.includes("@");
-    const identifier = isEmail ? { email: emailOrId } : { id: emailOrId };
+    const identifier = isEmail
+        ? { email: emailOrId }
+        : { id: Number(emailOrId) };
 
     return permanently
         ? prisma.user.delete({
@@ -96,7 +100,7 @@ const deleteUser = async (emailOrId: string, permanently: boolean = false) => {
 const updateUser = async (emailOrId: string, data: Partial<User>) => {
     const identifier = emailOrId.includes("@")
         ? { email: emailOrId }
-        : { id: emailOrId };
+        : { id: Number(emailOrId) };
 
     return prisma.user.update({
         where: identifier,

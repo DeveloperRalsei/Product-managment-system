@@ -5,9 +5,12 @@ import { encryptPassword } from "~/utils";
 const prisma = new PrismaClient();
 
 async function main() {
-    return prisma.category.create({
+    return prisma.user.create({
         data: {
-            name: "Kolonyalar",
+            email: "rizayildirim126@gmail.com",
+            password: encryptPassword("123123"),
+            role: "ADMIN",
+            name: "",
         },
     });
 }

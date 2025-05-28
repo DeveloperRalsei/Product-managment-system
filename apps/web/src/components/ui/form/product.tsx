@@ -1,4 +1,4 @@
-import { Product, productSchema } from "#";
+import { Category, Product, productSchema } from "#";
 import {
     Button,
     Text,
@@ -28,10 +28,11 @@ import { useEffect, useMemo } from "react";
 import { Editor } from "./text-editor";
 import { getAllCategories } from "@/utils/api/category";
 import { useQuery } from "@tanstack/react-query";
+import { notifyWithResponse } from "@/utils/notifications";
 
 export type ProductFormValues = Omit<
     Product,
-    "id" | "category" | "createdAt" | "updatedAt" | "images"
+    "id" | "createdAt" | "updatedAt" | "images"
 > & { images: File[] };
 
 const currencyValues: Record<Product["currency"], React.ReactNode> = {
@@ -63,7 +64,11 @@ export const ProductForm = ({
     });
 
     const { data: categories, isPending: isCategoriesLoading } = useQuery({
-        queryFn: () => getAllCategories(),
+        queryFn: async () => {
+            const res = await getAllCategories();
+            if (!res.ok) notifyWithResponse(res);
+            return (await res.json()) as Category[];
+        },
         queryKey: ["categories"],
     });
 
@@ -150,26 +155,33 @@ export const ProductForm = ({
                 ) : categories ? (
                     <Chip.Group
                         multiple
-                        value={form.values.categoryIDs}
-                        onChange={(v) => form.setFieldValue("categoryIDs", v)}
+                        value={form.values.categoryIDs.map((cat) =>
+                            cat.toString(),
+                        )}
+                        onChange={(val) =>
+                            form.setFieldValue(
+                                "categoryIDs",
+                                val.map((v) => parseInt(v)),
+                            )
+                        }
                     >
-                        {categories.map((cat) => {
-                            const isChecked = form.values.categoryIDs.includes(
-                                cat.id,
-                            );
-                            return (
-                                <Chip
-                                    key={cat.id}
-                                    value={cat.id}
-                                    checked={isChecked}
-                                >
-                                    {cat.name}
-                                </Chip>
-                            );
-                        })}
+                        {categories.map((cat) => (
+                            <Chip
+                                key={cat.id}
+                                value={cat.id}
+                                checked={form.values.categoryIDs.includes(
+                                    Number(cat.id),
+                                )}
+                            >
+                                {cat.name}
+                            </Chip>
+                        ))}
                     </Chip.Group>
                 ) : (
-                    "Kategori bulunamadı"
+                    <Text c="red" fw="bold">
+                        "Kategori bulunamadı. Lütfen ürün eklemek için ilk önce
+                        bir tane kategori ekleyin"
+                    </Text>
                 )}
                 {form.errors.categoryIDs && (
                     <Text c="red">{form.errors.categoryIDs}</Text>
@@ -215,9 +227,18 @@ export const ProductForm = ({
                             Resim Yok
                         </Center>
                     )}
+                    {import.meta.env.DEV && (
+                        <>
+                            {form.values && (
+                                <pre>
+                                    {JSON.stringify(form.errors, null, 2)}
+                                </pre>
+                            )}
+                            <pre>{JSON.stringify(form.values, null, 2)}</pre>
+                        </>
+                    )}
                 </SimpleGrid>
             </Stack>
-            <pre>{JSON.stringify(form.errors, null, 2)}</pre>
             <Group mt="sm">
                 <Button onClick={form.reset} variant="default">
                     Sıfırla

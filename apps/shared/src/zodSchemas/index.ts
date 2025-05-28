@@ -21,21 +21,19 @@ export const productSchema = z.object({
         .optional(),
     price: z.coerce.number().nonnegative("Zarar etmek istiyorsun herhalde :)"),
     barcode: z.coerce
-        .number({
+        .string({
             required_error: "Barkod zorunludur",
             invalid_type_error: "Lütfen geçerli bir değer giriniz",
+            message: "Ondalıklı sayı geçersizdir",
         })
-        .int("Ondalıklı sayı geçersizdir")
-        .nonnegative("Negatif değer geçerli değil")
-        .refine((v) => v.toString().length === 12, {
+        .refine((v) => v.length === 12, {
             message: "Barkod 12 karakter olmalı",
         }),
     currency: currencyEnum.default("TRY"),
     inStock: z.coerce.boolean().default(true),
     isActive: z.coerce.boolean().default(true),
-    brandID: z.string().optional(),
     categoryIDs: z
-        .union([z.string(), z.array(z.string())])
+        .union([z.number().int(), z.array(z.number().int())])
         .transform((val) => (Array.isArray(val) ? val : [val]))
         .refine((arr) => arr.length > 0, "En az bir kategori seçmelisiniz"),
     quantity: z.coerce
@@ -66,7 +64,7 @@ export const productSchema = z.object({
                 }
             });
         }),
-    videoUrl: z.coerce.string().optional(),
+    videoUrl: z.string().optional(),
     tags: z
         .union([z.array(z.string()), z.string()])
         .transform((val) => (Array.isArray(val) ? val : [val]))
@@ -79,6 +77,5 @@ export const categorySchema = z.object({
     name: z.string().nonempty("Kategori ismi zorunludur"),
     bannerUrl: z.string().optional(),
     logoUrl: z.string().optional(),
-    productIDs: z.array(z.string()),
-    parentCategoryId: z.string().optional(),
+    parentCategoryID: z.string().optional(),
 });
