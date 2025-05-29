@@ -7,6 +7,11 @@ export const notifyWithResponse = (res: Response) => {
                 color: "green",
                 message: "İşlem başarılı",
             });
+        case 202:
+            return showNotification({
+                color: "green",
+                message: "İşlem başarılı",
+            });
         case 401:
             return showNotification({
                 color: "red",

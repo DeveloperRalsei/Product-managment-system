@@ -19,7 +19,7 @@ const defaultSelectValues: Prisma.ProductSelect = {
     barcode: true,
     rating: true,
     videoUrl: true,
-    categories: true,
+    category: true,
 };
 
 const ITEM_COUNT_PER_PAGE = 20;
@@ -46,7 +46,6 @@ const getAll = async (q?: string, page = 1) => {
 const getOneById = async (id: number) =>
     await prisma.product.findUnique({
         where: { id },
-        select: defaultSelectValues,
     });
 
 const create = async ({ images, ...productData }: ProductInput, c: Context) => {
@@ -56,14 +55,12 @@ const create = async ({ images, ...productData }: ProductInput, c: Context) => {
         if (img.startsWith(process.cwd())) img = img.replace(process.cwd(), "");
     });
 
-    const { categoryIDs: _b, ...p } = productData;
+    const { categoryID: _b, ...p } = productData;
     const data: Prisma.ProductCreateInput = {
         ...p,
         images: imgList,
-        categories: {
-            connect: productData.categoryIDs.map((id) => ({
-                id,
-            })),
+        category: {
+            connect: { id: productData.categoryID },
         },
     };
 
@@ -96,15 +93,15 @@ async function update(
         if (img.startsWith(process.cwd())) img = img.replace(process.cwd(), "");
     });
 
-    const { categoryIDs: _, ...p } = productData;
+    const { categoryID: _, ...p } = productData;
 
     const data: Prisma.ProductCreateInput = {
         ...p,
         images: imgList,
-        categories: {
-            connect: productData.categoryIDs.map((id) => ({
-                id,
-            })),
+        category: {
+            connect: {
+                id: productData.categoryID,
+            },
         },
     };
 

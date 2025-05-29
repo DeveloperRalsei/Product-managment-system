@@ -31,37 +31,43 @@ model User {
 }
 
 model Product {
-    id          Int        @id @default(autoincrement())
+    id          Int            @id @default(autoincrement())
     name        String
-    barcode     String     @unique
+    barcode     String         @unique
     description String?
     price       Float
-    currency    Currency   @default(TRY)
-    inStock     Boolean    @default(true)
-    isActive    Boolean    @default(true)
-    quantity    Int        @default(0)
+    currency    Currency       @default(TRY)
+    inStock     Boolean        @default(true)
+    isActive    Boolean        @default(true)
+    quantity    Int            @default(0)
     images      String[]
     videoUrl    String?
     tags        String[]
-    rating      Int        @default(0)
-    categories  Category[]
+    rating      Int            @default(0)
+    category    ChildCategory? @relation(fields: [categoryID], references: [id])
+    categoryID  Int?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 
-model Category {
-    id               Int        @id @default(autoincrement())
-    name             String
-    bannerUrl        String?
-    logoUrl          String?
-    products         Product[]
-    childCategories  Category[] @relation("CategoryChildren")
-    parentCategory   Category?  @relation("CategoryChildren", fields: [parentCategoryID], references: [id])
-    parentCategoryID Int?
+model ParentCategory {
+    id              Int             @id @default(autoincrement())
+    name            String
+    bannerUrl       String?
+    logoUrl         String?
+    childCategories ChildCategory[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+}
+
+model ChildCategory {
+    id               Int            @id @default(autoincrement())
+    name             String
+    products         Product[]
+    ParentCategory   ParentCategory @relation(fields: [parentCategoryId], references: [id])
+    parentCategoryId Int
 }
 
 model Brand {

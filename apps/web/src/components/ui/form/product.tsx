@@ -1,4 +1,4 @@
-import { Category, Product, productSchema } from "#";
+import { CategoriesReturnType, Product, productSchema } from "#";
 import {
     Button,
     Text,
@@ -15,6 +15,7 @@ import {
     Stack,
     TagsInput,
     TextInput,
+    ScrollArea,
 } from "@mantine/core";
 import { useForm, UseFormReturnType, zodResolver } from "@mantine/form";
 import {
@@ -24,7 +25,7 @@ import {
     IconHash,
 } from "@tabler/icons-react";
 import { Carousel } from "@mantine/carousel";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Editor } from "./text-editor";
 import { getAllCategories } from "@/utils/api/category";
 import { useQuery } from "@tanstack/react-query";
@@ -56,6 +57,8 @@ export const ProductForm = ({
         >,
     ) => void;
 }) => {
+    const [activeParentCategoryIndex, setActiveParentCategoryIndex] =
+        useState<number>();
     const form = useForm<ProductFormValues>({
         mode: "controlled",
         initialValues,
@@ -67,7 +70,7 @@ export const ProductForm = ({
         queryFn: async () => {
             const res = await getAllCategories();
             if (!res.ok) notifyWithResponse(res);
-            return (await res.json()) as Category[];
+            return (await res.json()) as CategoriesReturnType;
         },
         queryKey: ["categories"],
     });
@@ -149,34 +152,66 @@ export const ProductForm = ({
                     }
                 />
                 <Divider label="Kategori ve Resimler" />
-                <InputLabel>Kategoriler</InputLabel>
+                <InputLabel>
+                    Kategoriler{" "}
+                    <Text span c="#dd1111">
+                        *
+                    </Text>
+                </InputLabel>
                 {isCategoriesLoading ? (
                     "Kategoriler Yükleniyor"
                 ) : categories ? (
-                    <Chip.Group
-                        multiple
-                        value={form.values.categoryIDs.map((cat) =>
-                            cat.toString(),
-                        )}
-                        onChange={(val) =>
-                            form.setFieldValue(
-                                "categoryIDs",
-                                val.map((v) => parseInt(v)),
-                            )
-                        }
-                    >
-                        {categories.map((cat) => (
-                            <Chip
-                                key={cat.id}
-                                value={cat.id}
-                                checked={form.values.categoryIDs.includes(
-                                    Number(cat.id),
-                                )}
-                            >
-                                {cat.name}
-                            </Chip>
-                        ))}
-                    </Chip.Group>
+                    <>
+                        <ScrollArea w="100%">
+                            <Chip.Group>
+                                {categories[0].map((parentCat, i) => (
+                                    <Chip
+                                        key={String(parentCat.id)}
+                                        radius="sm"
+                                        checked={
+                                            i === activeParentCategoryIndex
+                                        }
+                                        onClick={() =>
+                                            setActiveParentCategoryIndex(i)
+                                        }
+                                    >
+                                        {parentCat.name}
+                                    </Chip>
+                                ))}
+                            </Chip.Group>
+                        </ScrollArea>
+                        <InputLabel>Alt Kategoriler</InputLabel>
+                        <Chip.Group
+                            value={String(form.values.categoryID)}
+                            onChange={(v) =>
+                                form.setFieldValue(
+                                    "categoryID",
+                                    Array.isArray(v)
+                                        ? parseInt(v[0])
+                                        : parseInt(v),
+                                )
+                            }
+                        >
+                            {activeParentCategoryIndex !== undefined ? (
+                                categories[0][
+                                    activeParentCategoryIndex
+                                ].childCategories.map((cat) => (
+                                    <Chip
+                                        key={cat.id}
+                                        value={cat.id}
+                                        radius="sm"
+                                        checked={
+                                            form.values.categoryID === cat.id
+                                        }
+                                    >
+                                        {cat.name}
+                                    </Chip>
+                                ))
+                            ) : (
+                                <>Lütfen ilk önce bir kategori seçin</>
+                            )}
+                        </Chip.Group>
+                    </>
                 ) : (
                     <Text c="red" fw="bold">
                         "Kategori bulunamadı. Lütfen ürün eklemek için ilk önce

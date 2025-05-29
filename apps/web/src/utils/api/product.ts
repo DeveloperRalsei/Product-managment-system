@@ -10,6 +10,8 @@ export const getAllProducts = async (q?: string, page?: number) =>
 export const createNewProduct = async (p: ProductFormValues) => {
     const formData = objectToFormData(p);
 
+    console.log(formData);
+
     return await fetch("/api/v1/product/new", {
         method: "POST",
         body: formData,

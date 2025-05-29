@@ -40,7 +40,7 @@ function RouteComponent() {
                     color: "red",
                 });
 
-            if (!ok) notifyWithResponse({ ...rest, status, ok });
+            notifyWithResponse({ ...rest, status, ok });
         },
     });
     const [images, setImages] = useState<File[]>([]);
@@ -78,8 +78,8 @@ function RouteComponent() {
             <ProductForm
                 initialValues={{
                     ...productData,
-                    categoryIDs: productData.categories.map((cat) => cat.id),
                     images,
+                    videoUrl: "",
                 }}
                 isPending={isProductPending || isPending}
                 onSubmit={(v) => mutate(v)}

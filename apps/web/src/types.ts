@@ -1,6 +1,6 @@
 import { FileRouteTypes } from "@/routeTree.gen";
 
-type parentNavLink = {
+export type parentNavLink = {
     label: string;
     path: FileRouteTypes["to"];
 };

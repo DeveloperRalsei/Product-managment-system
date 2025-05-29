@@ -5,12 +5,20 @@ import { encryptPassword } from "~/utils";
 const prisma = new PrismaClient();
 
 async function main() {
-    return prisma.user.create({
+    const pCat = await prisma.parentCategory.create({
         data: {
-            email: "rizayildirim126@gmail.com",
-            password: encryptPassword("123123"),
-            role: "ADMIN",
-            name: "",
+            name: "Kolonya",
+        },
+    });
+
+    const cCat = await prisma.childCategory.create({
+        data: {
+            name: "Gül Kolonyası",
+            ParentCategory: {
+                connect: {
+                    id: pCat.id,
+                },
+            },
         },
     });
 }

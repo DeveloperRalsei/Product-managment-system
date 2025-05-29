@@ -32,10 +32,7 @@ export const productSchema = z.object({
     currency: currencyEnum.default("TRY"),
     inStock: z.coerce.boolean().default(true),
     isActive: z.coerce.boolean().default(true),
-    categoryIDs: z
-        .union([z.number().int(), z.array(z.number().int())])
-        .transform((val) => (Array.isArray(val) ? val : [val]))
-        .refine((arr) => arr.length > 0, "En az bir kategori seçmelisiniz"),
+    categoryID: z.coerce.number().int().optional(),
     quantity: z.coerce
         .number()
         .int("Geçersiz değer")
@@ -75,7 +72,7 @@ export const productSchema = z.object({
 
 export const categorySchema = z.object({
     name: z.string().nonempty("Kategori ismi zorunludur"),
-    bannerUrl: z.string().optional(),
-    logoUrl: z.string().optional(),
+    bannerUrl: z.instanceof(File).optional(),
+    logoUrl: z.instanceof(File).optional(),
     parentCategoryID: z.string().optional(),
 });

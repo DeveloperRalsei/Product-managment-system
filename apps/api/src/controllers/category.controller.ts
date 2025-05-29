@@ -1,5 +1,4 @@
 import { tryCatch } from "#";
-import { Prisma } from "#/prisma";
 import { MiddlewareHandler } from "hono";
 import { Context } from "hono";
 import categoryService from "~/service/category.service";
@@ -12,11 +11,8 @@ export const getAllCategories: MiddlewareHandler = async (c) => {
         true,
     );
     if (error) return c.json({ error });
+    const [parentCategories, childCategories] = categories;
     return c.json(categories);
 };
 
-export const createNewCategory = async (c: Context, body: CategoryInput) => {
-    const data: Prisma.CategoryCreateInput = {
-        ...body,
-    };
-};
+export const createNewCategory = async (c: Context, body: CategoryInput) => {};

@@ -1,2 +1,2 @@
-export * from "./ColorSchemeToggle";
+export * from "./buttons";
 export * from "./page/NotFoundComponent";
