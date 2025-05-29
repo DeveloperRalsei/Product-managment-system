@@ -1,2 +1,2 @@
-export * from "./ui/AppShell";
+export * from "./ui/layout/AppShell";
 export * from "./ui";

@@ -86,7 +86,6 @@ export const ProductTable = ({
                         <Table.Th>#</Table.Th>
                         <Table.Th>Resim</Table.Th>
                         <Table.Th>Ürün Adı</Table.Th>
-                        <Table.Th>Marka</Table.Th>
                         <Table.Th style={{ textAlign: "right" }}>
                             Fiyat
                         </Table.Th>
@@ -118,14 +117,6 @@ export const ProductTable = ({
                                 <Table.Td style={{ maxWidth: 200 }}>
                                     <Text truncate="end" fz="md" fw="bold">
                                         {p.name}
-                                    </Text>
-                                </Table.Td>
-                                <Table.Td>
-                                    <Text
-                                        fw="bold"
-                                        c={p.brand ? "black" : "dimmed"}
-                                    >
-                                        {p.brand?.name ?? "Tanımsız"}
                                     </Text>
                                 </Table.Td>
                                 <Table.Td style={{ textAlign: "right" }}>

@@ -54,7 +54,7 @@ function RouteComponent() {
                         price: 0,
                         quantity: 0,
                         tags: [],
-                        barcode: 0,
+                        barcode: "000000000000",
                     }}
                     isPending={isPending}
                     onSubmit={(v) => mutate(v)}

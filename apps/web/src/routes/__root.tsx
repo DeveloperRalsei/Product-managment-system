@@ -5,11 +5,10 @@ import {
     redirect,
     useLocation,
 } from "@tanstack/react-router";
-import { Layout, NotFoundComponent } from "../components";
+import { NotFoundComponent } from "../components";
 import { isAuthenticated } from "@/utils/api/auth";
 import { ErrorComponent } from "@/components/ui/page/ErrorComponent";
-import { BreadCrumbs } from "@/components/ui/page/BreadCrumbs";
-import { NavbarLayout } from "@/components/ui/layout";
+import { Layout } from "@/components/ui/layout";
 
 function redirectLogin(redirectPath: string = "/") {
     throw redirect({
@@ -45,9 +44,9 @@ function RootComponent() {
     return (
         <>
             <HeadContent />
-            <NavbarLayout>
+            <Layout>
                 <Outlet />
-            </NavbarLayout>
+            </Layout>
         </>
     );
 }
